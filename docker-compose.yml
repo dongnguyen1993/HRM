@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # 1. SQL Server Database (MSSQL 2022)
+  # ============================================================================
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: hrm-sqlserver
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Sa@123456
+      - MSSQL_PID=Developer
+    ports:
+      - "14333:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./HRM_Enterprise_DB.sql:/docker-init/HRM_Enterprise_DB.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Sa@123456 -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - hrm-network
+
+  # ============================================================================
+  # 2. HRM Backend API (.NET 8)
+  # ============================================================================
+  backend:
+    build:
+      context: ./HRM.Backend
+      dockerfile: HRM.Backend/Dockerfile
+    container_name: hrm-backend
+    restart: unless-stopped
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=HRM_Enterprise_DB;User Id=sa;Password=Sa@123456;TrustServerCertificate=True;MultipleActiveResultSets=true;
+      - JwtSettings__Secret=SuperSecretKeyForHRMAndERPSystemIntegrationSecure2026
+      - JwtSettings__Issuer=HRM.Backend.Security
+      - JwtSettings__Audience=HRM.Enterprise.Clients
+      - JwtSettings__AccessTokenExpirationMinutes=150
+      - JwtSettings__RefreshTokenExpirationDays=7
+      - SecuritySettings__AesKey=3qyvE4U6rY3eT9A6X1kM7pQ9nF1wD8vS5zC4xB2mE7o=
+    ports:
+      - "7014:8080"
+    networks:
+      - hrm-network
+
+  # ============================================================================
+  # 3. HRM Frontend Web (UmiJS Max + Nginx) -> PUBLIC PORT 1993
+  # ============================================================================
+  frontend:
+    build:
+      context: ./HRM.Frontend
+      dockerfile: Dockerfile
+    container_name: hrm-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "1993:80"
+    networks:
+      - hrm-network
+
+volumes:
+  sqlserver_data:
+    driver: local
+
+networks:
+  hrm-network:
+    driver: bridge
