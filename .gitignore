@@ -1,0 +1,82 @@
+# ==========================================
+# 1. FILE DỮ LIỆU LỚN & TÀI LIỆU NỘI BỘ
+# ==========================================
+*.bak
+*.mdf
+*.ldf
+HRM_Enterprise_DB_Full.bak
+scratch/
+implementation_plan/
+tests/
+docs/
+Design/
+.dotnet/
+update_audit.ps1
+.tmp.driveupload/
+.tmp.drivedownload/
+
+# ==========================================
+# 2. CÁC PROJECT THỬ NGHIỆM / TEST (BACKEND)
+# ==========================================
+HRM.Backend.Tests/
+**/HRM.Backend.Tests/
+IntuitiveChatClient/
+**/IntuitiveChatClient/
+NotePad/
+**/NotePad/
+chat/
+**/chat/
+[Bb]in/
+[Oo]bj/
+**/[Bb]in/
+**/[Oo]bj/
+*.pdb
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.vsidx
+DocumentLayout*.json
+appsettings.Development.json
+**/appsettings.Development.json
+appsettings.Local.json
+**/appsettings.Local.json
+**/secrets.json
+.env
+.env.local
+*.env.*
+.vs/
+**/.vs/
+.idea/
+.vscode/
+
+# ==========================================
+# 3. THƯ VIỆN & CACHE BUILD (FRONTEND)
+# ==========================================
+node_modules/
+**/node_modules/
+.umi/
+**/.umi/
+.umi-production/
+**/.umi-production/
+.umi-test/
+**/.umi-test/
+.mfsu/
+**/.mfsu/
+dist/
+**/dist/
+.turbopack/
+.swc/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==========================================
+# 4. LOGS, FILE TẠM & UPLOADS
+# ==========================================
+logs/
+**/logs/
+*.log
+*.tmp
+*.tmp.*
+**/wwwroot/uploads/

@@ -1,0 +1,61 @@
+name: HRM Enterprise CI/CD Pipeline
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  # ============================================================================
+  # JOB 1: Backend Build & Unit Tests
+  # ============================================================================
+  backend-test:
+    name: Backend Build & xUnit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore Backend Dependencies
+      run: dotnet restore HRM.Backend/HRM.Backend.slnx
+
+    - name: Build Backend Solution
+      run: dotnet build HRM.Backend/HRM.Backend.slnx --configuration Release --no-restore
+
+    - name: Run xUnit Unit Tests
+      run: dotnet test HRM.Backend/HRM.Backend.Tests/HRM.Backend.Tests.csproj --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+
+  # ============================================================================
+  # JOB 2: Frontend Build & Typecheck
+  # ============================================================================
+  frontend-build:
+    name: Frontend Lint & Webpack Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+        cache-dependency-path: HRM.Frontend/package-lock.json
+
+    - name: Install Frontend Dependencies
+      working-directory: ./HRM.Frontend
+      run: npm ci || npm install --registry=https://registry.npmmirror.com
+
+    - name: Run Max Setup & Build Production Bundle
+      working-directory: ./HRM.Frontend
+      run: |
+        npx max setup
+        npm run build

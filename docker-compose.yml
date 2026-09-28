@@ -44,7 +44,7 @@ services:
       - JwtSettings__Secret=SuperSecretKeyForHRMAndERPSystemIntegrationSecure2026
       - JwtSettings__Issuer=HRM.Backend.Security
       - JwtSettings__Audience=HRM.Enterprise.Clients
-      - JwtSettings__AccessTokenExpirationMinutes=150
+      - JwtSettings__AccessTokenExpirationMinutes=10
       - JwtSettings__RefreshTokenExpirationDays=7
       - SecuritySettings__AesKey=3qyvE4U6rY3eT9A6X1kM7pQ9nF1wD8vS5zC4xB2mE7o=
     ports:

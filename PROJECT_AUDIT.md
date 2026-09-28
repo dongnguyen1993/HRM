@@ -691,7 +691,7 @@ AND m.DeviceName NOT LIKE '%CANTEEN%'
 
 ✅ **Tốt:**
 - Dual index cho `Users`: `IX_Users_SecureId` (API endpoint) + `IX_Users_UserCode` (login + BioStar)
-- `IX_UserTokens_RefreshToken` là index cực kỳ quan trọng — truy vấn này chạy mỗi 150 phút/lần
+- `IX_UserTokens_RefreshToken` là index cực kỳ quan trọng — truy vấn này chạy mỗi 10 phút/lần (theo hiệu lực Access Token mới)
 - `IX_OtRegistrations_UserDate` composite với 3 cột phù hợp với query pattern của OT module
 - `UQ_AttendanceLogs_UserCode_WorkDate` đóng vai trò constraint nghiệp vụ quan trọng
 
