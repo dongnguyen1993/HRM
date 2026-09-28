@@ -1,22 +1,31 @@
 # ==========================================
-# 1. FILE DỮ LIỆU LỚN & TÀI LIỆU NỘI BỘ
+# 1. BẢO MẬT: CHẶN CÁC FILE CẤU HÌNH CHỨA MẬT KHẨU THẬT
+# ==========================================
+appsettings.Development.json
+**/appsettings.Development.json
+appsettings.Production.json
+**/appsettings.Production.json
+appsettings.Local.json
+**/appsettings.Local.json
+*.local.json
+**/*.local.json
+**/secrets.json
+.env
+.env.*
+.env.local
+
+# ==========================================
+# 2. CƠ SỞ DỮ LIỆU & FILE BACKUP NẶNG
 # ==========================================
 *.bak
 *.mdf
 *.ldf
 HRM_Enterprise_DB_Full.bak
-scratch/
-implementation_plan/
-tests/
-docs/
-Design/
-.dotnet/
-update_audit.ps1
 .tmp.driveupload/
 .tmp.drivedownload/
 
 # ==========================================
-# 2. CÁC PROJECT THỬ NGHIỆM / TEST (BACKEND)
+# 3. THƯ MỤC TEST & APP NHÁP KHÔNG DÙNG TRÊN PRODUCTION
 # ==========================================
 HRM.Backend.Tests/
 **/HRM.Backend.Tests/
@@ -26,6 +35,18 @@ NotePad/
 **/NotePad/
 chat/
 **/chat/
+scratch/
+**/scratch/
+implementation_plan/
+tests/
+docs/
+Design/
+.dotnet/
+update_audit.ps1
+
+# ==========================================
+# 4. BUILD & CACHE .NET (BACKEND)
+# ==========================================
 [Bb]in/
 [Oo]bj/
 **/[Bb]in/
@@ -37,21 +58,13 @@ chat/
 *.sln.docstates
 *.vsidx
 DocumentLayout*.json
-appsettings.Development.json
-**/appsettings.Development.json
-appsettings.Local.json
-**/appsettings.Local.json
-**/secrets.json
-.env
-.env.local
-*.env.*
 .vs/
 **/.vs/
 .idea/
 .vscode/
 
 # ==========================================
-# 3. THƯ VIỆN & CACHE BUILD (FRONTEND)
+# 5. BUILD & CACHE NODE / REACT (FRONTEND)
 # ==========================================
 node_modules/
 **/node_modules/
@@ -72,7 +85,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # ==========================================
-# 4. LOGS, FILE TẠM & UPLOADS
+# 6. LOGS & FILE TẠM & UPLOADS
 # ==========================================
 logs/
 **/logs/
