@@ -275,6 +275,7 @@ Services/Common/    (CurrentUserService)
 | **Lịch làm việc (Work Calendar)** | ✅ Phân quyền endpoints ca vs suất ăn | ✅ UI phân quyền: HR sửa ca ✎, GA sửa suất ăn ⭐ | ✅ | 🟢 **100%** | **Sửa triệt để lỗi Infinite Re-render Loop & Skeleton Loading; Quốc tế hóa 3 ngôn ngữ (VIE-KOR-ENG); Đưa lên menu Quản trị nhân sự (26/09)** |
 | **Quản lý Bảng lương (Payroll)** | ✅ Full CRUD + ClosedXML Export + Bulk Ingest 166 Cols | ✅ BaseTable + Smart Sorters + Warm Charcoal + i18n 100% | ✅ | 🟢 **100%** | **Nâng cấp sang BaseTable chuẩn mới, xuất Excel ClosedXML tự động SUM, 32/32 Unit Tests PASS, đa ngôn ngữ 100% (25/09)** |
 | **Bảng tin & Thông báo (Announcements)** | ✅ Full CRUD + Ghim bài + Lượt xem | ✅ Admin quản lý tin tức + User đọc tin có badge | ✅ | 🟢 **100%** | **Phân hệ tin tức nội bộ công ty cho Quản trị viên và toàn thể Nhân viên (22/09)** |
+| **Thông Báo Động (Dynamic Notification Matrix)** | ✅ Dynamic Routing + SignalR Groups + Dapper + DB Inbox | ✅ UI Matrix + Recipients Modal + Template Editor + Test Modal | ✅ | 🟢 **100%** | **Tùy biến gán sự kiện thông báo (Suất ăn, Nghỉ phép, Lương, Phân quyền, Bảng tin) cho Roles/Users không hardcode; Kết nối SignalR LongPolling + NotificationBell DB Sync (15/10/2026)** |
 | **DevOps & Docker Deployment** | ✅ .NET 8 API (8080/7014) + MSSQL 2022 (14333) | ✅ Nginx Alpine SPA (port 1993) | ✅ | 🟢 **100%** | **Chuẩn hóa cổng MSSQL 14333, Backend 7014, Frontend 1993; Đóng gói Image Nginx Alpine tối ưu buffer 64k/128k; Public thành công (26/09)** |
 
 ---
