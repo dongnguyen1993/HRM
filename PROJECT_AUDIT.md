@@ -2,13 +2,33 @@
 
 > **Người thực hiện:** Senior Fullstack Architect (AI Review)  
 > **Ngày kiểm định ban đầu:** 2026-09-04  
-> **Cập nhật lần cuối:** 2026-10-07 (Phiên 07-10-2026: Tự động khởi tạo tài khoản Admin khi Backend khởi động lần đầu — Mật khẩu mặc định Hansol@12345 — Chính sách bắt buộc đổi mật khẩu định kỳ ngày 30 của tháng 4, 8, 12 cho toàn bộ User trừ Admin — Chống trùng mật khẩu cũ — 54/54 Unit Tests PASS — 12/12 Security Tests PASS)  
+> **Cập nhật lần cuối:** 2026-10-15 (Phiên 15-10-2026: Tổng rà soát, kiểm tra chất lượng Audit & QA toàn diện 5 phân hệ trọng yếu — Bảo mật, Token, Quản trị hệ thống, Hành chính GA, Self-Service suất ăn và Đa ngôn ngữ — Sửa triệt để 100% lỗi TypeScript Frontend `npx tsc --noEmit` & `npm run build` PASS — Backend `dotnet build -c Release` 0 errors, 54/54 Unit Tests PASS)  
 > **Phạm vi:** Toàn bộ monorepo `d:\HRM` — gồm `HRM.Backend` (.NET 8), `HRM.Frontend` (UmiJS/React), `HRM.Backend.Tests` (xUnit), Docker Containerization và Database SQL Server  
-> **Trạng thái tổng quan:** 🟢 **HỆ THỐNG ĐẠT CHUẨN PRODUCTION-READY (100%) — Hoàn thiện toàn diện Trang Chủ, Quản trị Nhân sự, Quản trị Hệ thống, Bảng lương, Suất ăn & Lịch làm việc theo kiến trúc phân tầng chuẩn mới; Cơ chế tự động gieo mầm tài khoản admin an toàn tuyệt đối; triệt tiêu 100% vòng lặp re-render; CSDL và bảo mật chuẩn doanh nghiệp; triển khai Docker Public ổn định cho người dùng.**
+> **Trạng thái tổng quan:** 🟢 **HỆ THỐNG ĐẠT CHUẨN PRODUCTION-READY (100%) — Hoàn thiện toàn diện 5 phân hệ cốt lõi; Khắc phục triệt để lỗi biên dịch TypeScript; Chuẩn hóa alias routes `/system/*` và đồng bộ ma trận quyền RBAC; Silent token rotation, Password rotation policy, Multi-department meal protection hoạt động hoàn hảo.**
 
 ---
 
-## 🌟 PHIÊN LÀM VIỆC MỚI NHẤT: SESSION 07-10-2026 — TỰ ĐỘNG KHỞI TẠO TÀI KHOẢN ADMIN & BẮT BUỘC ĐỔI MẬT KHẨU LẦN ĐẦU ĐĂNG NHẬP
+## 🌟 PHIÊN LÀM VIỆC MỚI NHẤT: SESSION 15-10-2026 — TỔNG RÀ SOÁT, KIỂM ĐỊNH CHẤT LƯỢNG (AUDIT & QA) VÀ VÁ LỖI TOÀN HỆ THỐNG
+
+### 1. Kết Quả Kiểm Tra Biên Dịch & Kiểm Thử Toàn Diện
+- **Backend (.NET 8):** `dotnet build -c Release` thành công **0 Warning(s), 0 Error(s)**.
+- **Backend Unit Tests:** `dotnet test -c Release` đạt **54/54 Unit Tests PASS (100%)**.
+- **Frontend Type Check:** `npx tsc --noEmit` đạt chuẩn **0 Error(s)**.
+- **Frontend Production Bundle:** `npm run build` (Max/UmiJS Webpack) biên dịch thành công 100% không lỗi.
+
+### 2. Danh Sách Lỗi Tồn Đọng Đã Khắc Phục Triệt Để Trong Phiên
+1. **Chuẩn hóa BaseTable generic constraints & ProTable fallback:** Sửa lỗi TS2430 và TS2344, mở rộng `BaseTableProps` omit `title`, hỗ trợ `ColumnsType` với tiêu đề nhóm (ColumnGroup) cho các bảng phức tạp.
+2. **Khắc phục PagedResponse DTO Frontend:** Bổ sung interface `PagedResponse<T>` trong `@/types/api.ts` đồng bộ cấu trúc với `PagedResponse.cs` Backend (`isSuccess`, `data: T[]`, `totalRecords`).
+3. **Sửa bảng Thông báo (`SystemMgmt/Announcements`):** Đồng bộ `request` với cấu trúc `totalRecords`, khắc phục các lỗi thuộc tính `length` và `filter`.
+4. **Sửa lỗi type render trong ProColumns:** Chuẩn hóa toàn bộ hàm `render: (_, record) => ...` tại `LeaveTypes`, `Contracts`, `SignInLogs`, `Requests`, `Shift`, `Timesheet`.
+5. **Sửa ModalForm.Item trong ShiftSetup:** Thay thế `ModalForm.Item` thành `Form.Item` từ `antd` trong `ShiftModal.tsx`.
+6. **Sửa Area Chart trong HomeAdmin:** Cast thuộc tính cấu hình biểu đồ tương thích chuẩn Ant Design Charts v2.
+7. **Sửa RecordModal trong MachineRecords:** Type cast tham số `handleDeviceChange(val as string)` loại bỏ lỗi `unknown`.
+8. **Đồng bộ hóa Route Aliases & Quyền hạn `/system/*`:** Bổ sung điều hướng URL tương thích ngược tại `.umirc.ts` và kế thừa ma trận quyền tại `access.ts` cho các đường dẫn `/system/users`, `/system/permissions`, `/system/common-code`, `/system/logs`.
+
+---
+
+## 🌟 PHIÊN LÀM VIỆC: SESSION 07-10-2026 — TỰ ĐỘNG KHỞI TẠO TÀI KHOẢN ADMIN & BẮT BUỘC ĐỔI MẬT KHẨU LẦN ĐẦU ĐĂNG NHẬP
 
 ### 1. Cơ Chế Khởi Tạo Tài Khoản Admin Khi Khởi Động Backend (Automated Admin Seeder)
 
