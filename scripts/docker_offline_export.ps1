@@ -2,7 +2,7 @@
 # SCRIPT XUẤT DOCKER IMAGES THÀNH CÁC FILE .TAR ĐỂ CHUYỂN SANG SERVER OFFLINE
 # ==============================================================================
 
-$outDir = "d:\HRM\docker-images"
+$outDir = Join-Path (Split-Path $PSScriptRoot -Parent) "docker-images"
 if (-not (Test-Path $outDir)) {
     New-Item -ItemType Directory -Path $outDir | Out-Null
 }

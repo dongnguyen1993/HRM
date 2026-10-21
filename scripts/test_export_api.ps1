@@ -11,7 +11,7 @@ $headers = @{
     Authorization = "Bearer $token"
 }
 
-$outFile = "d:\HRM\scripts\exported_test.xlsx"
+$outFile = Join-Path $PSScriptRoot "exported_test.xlsx"
 $res = Invoke-WebRequest -Uri "http://localhost:5020/api/meal-orders/admin/export-excel?fromDate=2026-09-01&toDate=2026-09-18" -Headers $headers -OutFile $outFile -PassThru
 
 Write-Host "Status code: $($res.StatusCode)"

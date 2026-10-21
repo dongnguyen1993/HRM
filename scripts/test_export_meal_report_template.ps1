@@ -15,7 +15,7 @@ $headers = @{
 }
 
 Write-Host "`n=== 2. EXPORT EXCEL (26/08/2026 - 25/09/2026) ==="
-$outputPath = "D:\HRM\scripts\downloaded_report_test.xlsx"
+$outputPath = Join-Path $PSScriptRoot "downloaded_report_test.xlsx"
 if (Test-Path $outputPath) { Remove-Item $outputPath -Force }
 
 $exportUrl = "http://localhost:7014/api/meal-orders/admin/export-excel?fromDate=2026-08-26&toDate=2026-09-25"

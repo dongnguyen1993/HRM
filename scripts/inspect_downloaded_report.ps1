@@ -2,7 +2,7 @@ $body = @{ UserCode = "ADMIN"; Password = "123456" } | ConvertTo-Json
 $loginRes = Invoke-RestMethod -Uri "http://localhost:5020/api/auth/login" -Method Post -Body $body -ContentType "application/json"
 $token = $loginRes.data.accessToken
 
-$outFile = "d:\HRM\scripts\sample_export.xlsx"
+$outFile = Join-Path $PSScriptRoot "sample_export.xlsx"
 if (Test-Path $outFile) { Remove-Item $outFile }
 
 $client = New-Object System.Net.WebClient

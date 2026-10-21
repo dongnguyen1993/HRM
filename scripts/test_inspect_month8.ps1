@@ -12,7 +12,7 @@ $headers = @{
     Authorization = "Bearer $token"
 }
 
-$outputPath = "D:\HRM\scripts\test_month8.xlsx"
+$outputPath = Join-Path $PSScriptRoot "test_month8.xlsx"
 if (Test-Path $outputPath) { Remove-Item $outputPath -Force }
 
 $exportUrl = "http://localhost:7014/api/meal-orders/admin/export-excel?fromDate=2026-08-26&toDate=2026-09-19"

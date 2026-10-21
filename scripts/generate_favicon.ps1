@@ -46,7 +46,7 @@ function Create-HansolBitmap([int]$size) {
     return $bmp
 }
 
-$frontendPublic = 'd:\HRM\HRM.Frontend\public'
+$frontendPublic = Join-Path (Split-Path $PSScriptRoot -Parent) 'HRM.Frontend\public'
 
 # Generate 64x64 PNG
 $bmp64 = Create-HansolBitmap 64

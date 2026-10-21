@@ -1,9 +1,10 @@
-$closedXmlDll = "C:\Users\dong.nguyenlam\.nuget\packages\closedxml\0.105.1\lib\netstandard2.1\ClosedXML.dll"
-$docFormatDll = "C:\Users\dong.nguyenlam\.nuget\packages\documentformat.openxml\3.1.1\lib\netstandard2.0\DocumentFormat.OpenXml.dll"
-$docFormatFwDll = "C:\Users\dong.nguyenlam\.nuget\packages\documentformat.openxml.framework\3.1.1\lib\netstandard2.0\DocumentFormat.OpenXml.Framework.dll"
-$sixLaborsDll = "C:\Users\dong.nguyenlam\.nuget\packages\sixlabors.fonts\1.0.0\lib\netstandard2.0\SixLabors.Fonts.dll"
-$excelNumFmt = "C:\Users\dong.nguyenlam\.nuget\packages\excelnumberformat\1.1.0\lib\netstandard2.0\ExcelNumberFormat.dll"
-$rbushDll = "C:\Users\dong.nguyenlam\.nuget\packages\rbush.signed\4.0.0\lib\netstandard2.0\RBush.dll"
+$nugetPackages = Join-Path $env:USERPROFILE ".nuget\packages"
+$closedXmlDll = Join-Path $nugetPackages "closedxml\0.105.1\lib\netstandard2.1\ClosedXML.dll"
+$docFormatDll = Join-Path $nugetPackages "documentformat.openxml\3.1.1\lib\netstandard2.0\DocumentFormat.OpenXml.dll"
+$docFormatFwDll = Join-Path $nugetPackages "documentformat.openxml.framework\3.1.1\lib\netstandard2.0\DocumentFormat.OpenXml.Framework.dll"
+$sixLaborsDll = Join-Path $nugetPackages "sixlabors.fonts\1.0.0\lib\netstandard2.0\SixLabors.Fonts.dll"
+$excelNumFmt = Join-Path $nugetPackages "excelnumberformat\1.1.0\lib\netstandard2.0\ExcelNumberFormat.dll"
+$rbushDll = Join-Path $nugetPackages "rbush.signed\4.0.0\lib\netstandard2.0\RBush.dll"
 
 Add-Type -Path $docFormatFwDll
 Add-Type -Path $docFormatDll
@@ -12,7 +13,8 @@ Add-Type -Path $excelNumFmt
 Add-Type -Path $rbushDll
 Add-Type -Path $closedXmlDll
 
-$templatePath = "D:\HRM\HRM.Backend\HRM.Backend\wwwroot\Excel_Import\TemplateReport_MealOrder.xlsx"
+$backendRoot = Join-Path (Split-Path $PSScriptRoot -Parent) "HRM.Backend\HRM.Backend"
+$templatePath = Join-Path $backendRoot "wwwroot\Excel_Import\TemplateReport_MealOrder.xlsx"
 $wb = New-Object ClosedXML.Excel.XLWorkbook($templatePath)
 Write-Host "Worksheets count: $($wb.Worksheets.Count)"
 foreach ($ws in $wb.Worksheets) {
@@ -21,7 +23,7 @@ foreach ($ws in $wb.Worksheets) {
 $s1 = $wb.Worksheet(1)
 Write-Host "A1 value: $($s1.Cell('A1').Value)"
 $s1.Cell("I3").Value = 25 # Day 1 Lunch GA
-$outputPath = "D:\HRM\HRM.Backend\HRM.Backend\wwwroot\Excel_Import\Test_Output.xlsx"
+$outputPath = Join-Path $backendRoot "wwwroot\Excel_Import\Test_Output.xlsx"
 $wb.SaveAs($outputPath)
 $wb.Dispose()
 Write-Host "Successfully saved to $outputPath"

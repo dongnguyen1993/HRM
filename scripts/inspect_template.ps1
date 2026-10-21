@@ -1,5 +1,6 @@
-Add-Type -Path "D:\HRM\HRM.Backend\HRM.Backend\bin\Debug\net8.0\ClosedXML.dll"
-$wb = New-Object ClosedXML.Excel.XLWorkbook("D:\HRM\HRM.Backend\HRM.Backend\wwwroot\Excel_Import\TemplateReport_MealOrder.xlsx")
+$backendDir = Join-Path (Split-Path $PSScriptRoot -Parent) "HRM.Backend\HRM.Backend"
+Add-Type -Path (Join-Path $backendDir "bin\Debug\net8.0\ClosedXML.dll")
+$wb = New-Object ClosedXML.Excel.XLWorkbook(Join-Path $backendDir "wwwroot\Excel_Import\TemplateReport_MealOrder.xlsx")
 $s1 = $wb.Worksheet(1)
 for ($r = 1; $r -le 6; $r++) {
     $vals = @()

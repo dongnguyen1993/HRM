@@ -1,4 +1,4 @@
-$sqlPath = "d:\HRM\scripts\pure_fix_font.sql"
+$sqlPath = Join-Path $PSScriptRoot "pure_fix_font.sql"
 $sqlScript = [System.IO.File]::ReadAllText($sqlPath, [System.Text.Encoding]::UTF8)
 
 $connectionStrings = @(
