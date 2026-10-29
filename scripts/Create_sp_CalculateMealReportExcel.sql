@@ -3,10 +3,15 @@
 -- Purpose: Calculate all meal quantities, unit prices, and revenue for
 --          Hansol Meal Report Excel export (TemplateReport_MealOrder.xlsx).
 -- Project: HRM Enterprise System (Hansol Standard)
--- Created: 2026-09-19
+-- Updated: 2026-10-29 (Fix Unicode font & support Korean Dinner 00:00)
 -- ==============================================================================
 
-USE [HRM_Enterprise_DB];
+USE [HRM_ENTERPRISE_DB];
+GO
+
+SET ANSI_NULLS ON;
+GO
+SET QUOTED_IDENTIFIER ON;
 GO
 
 IF OBJECT_ID('dbo.sp_CalculateMealReportExcel', 'P') IS NOT NULL
@@ -22,7 +27,7 @@ BEGIN
 
     -- 1. Standard meal unit prices according to Hansol factory policy
     DECLARE @DefaultMealPrice DECIMAL(18,0) = 24000;    -- Default price for Vietnamese meals
-    DECLARE @KoreanLunchPrice DECIMAL(18,0) = 75000;    -- Korean specialist lunch price
+    DECLARE @KoreanLunchPrice DECIMAL(18,0) = 75000;    -- Korean specialist lunch / OT / dinner price
     DECLARE @KoreanDayOtPrice DECIMAL(18,0) = 75000;    -- Korean specialist afternoon OT price
     DECLARE @KoreanMorningPrice DECIMAL(18,0) = 45000;  -- Korean specialist morning OT price
 
@@ -116,14 +121,16 @@ BEGIN
     WHERE o.DepartmentCode NOT IN ('KOREAN', 'HAN')
       AND o.OrderDate BETWEEN @StartDate AND @EndDate;
 
-    -- 4.2. Korean Specialist Block
+    -- 4.2. Korean Specialist Block (Suất sáng: 45k; Suất trưa, Suất chiều, Suất tối: 75k)
     DECLARE @TotalKoreanLunch INT = 0;
     DECLARE @TotalKoreanDayOt INT = 0;
+    DECLARE @TotalKoreanDinner INT = 0;
     DECLARE @TotalKoreanNightOt INT = 0;
 
     SELECT 
         @TotalKoreanLunch = ISNULL(SUM(o.DayLunchCount), 0),
         @TotalKoreanDayOt = ISNULL(SUM(o.DayOtCount), 0),
+        @TotalKoreanDinner = ISNULL(SUM(o.NightDinnerCount), 0),
         @TotalKoreanNightOt = ISNULL(SUM(o.NightOtCount), 0)
     FROM DepartmentMealOrders o WITH (NOLOCK)
     WHERE o.DepartmentCode IN ('KOREAN', 'HAN')
@@ -153,8 +160,8 @@ BEGIN
 
     DECLARE @NightOtAmount DECIMAL(18,0) = @TotalVietNightOt * @DefaultMealPrice;
 
-    -- Korean meal amounts
-    DECLARE @KoreanLunchDayOtAmount DECIMAL(18,0) = (@TotalKoreanLunch + @TotalKoreanDayOt) * @KoreanLunchPrice;
+    -- Korean meal amounts (Trưa 12:00, Chiều 17:00, Tối 00:00 đồng giá 75.000đ; Sáng 05:00 giá 45.000đ)
+    DECLARE @KoreanLunchDayOtAmount DECIMAL(18,0) = (@TotalKoreanLunch + @TotalKoreanDayOt + @TotalKoreanDinner) * @KoreanLunchPrice;
     DECLARE @KoreanMorningAmount DECIMAL(18,0) = @TotalKoreanNightOt * @KoreanMorningPrice;
 
     -- Total revenues
@@ -199,6 +206,7 @@ BEGIN
         -- Korean Specialist Meals
         @TotalKoreanLunch AS KoreanLunchCount,
         @TotalKoreanDayOt AS KoreanDayOtCount,
+        @TotalKoreanDinner AS KoreanDinnerCount,
         @TotalKoreanNightOt AS KoreanNightOtCount,
         @KoreanLunchDayOtAmount AS KoreanLunchDayOtAmount, -- AR5
         @KoreanMorningAmount AS KoreanMorningAmount,       -- AR6
@@ -252,15 +260,17 @@ BEGIN
         d.DayNumber,
         d.DayOfWeekVi,
         d.IsSunday,
-        ISNULL(k.DayLunchCount, 0) AS DayLunchCount,  -- Column E: Lunch
-        ISNULL(k.DayOtCount, 0) AS DayOtCount,        -- Column F: Afternoon OT
-        ISNULL(k.NightOtCount, 0) AS NightOtCount     -- Column D: Morning OT
+        ISNULL(k.DayLunchCount, 0) AS DayLunchCount,      -- Column E: Lunch
+        ISNULL(k.DayOtCount, 0) AS DayOtCount,            -- Column F: Afternoon OT
+        ISNULL(k.NightDinnerCount, 0) AS NightDinnerCount,
+        ISNULL(k.NightOtCount, 0) AS NightOtCount         -- Column D: Morning OT
     FROM @Dates d
     LEFT JOIN (
         SELECT 
             o.OrderDate,
             SUM(o.DayLunchCount) AS DayLunchCount,
             SUM(o.DayOtCount) AS DayOtCount,
+            SUM(o.NightDinnerCount) AS NightDinnerCount,
             SUM(o.NightOtCount) AS NightOtCount
         FROM DepartmentMealOrders o WITH (NOLOCK)
         WHERE o.DepartmentCode IN ('KOREAN', 'HAN')
