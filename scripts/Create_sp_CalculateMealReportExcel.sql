@@ -3,11 +3,8 @@
 -- Purpose: Calculate all meal quantities, unit prices, and revenue for
 --          Hansol Meal Report Excel export (TemplateReport_MealOrder.xlsx).
 -- Project: HRM Enterprise System (Hansol Standard)
--- Updated: 2026-10-29 (Fix Unicode font & support Korean Dinner 00:00)
+-- Updated: 2026-11-04 (Updated table names to GA_DepartmentMealOrders, GA_WorkCalendar, GA_Departments)
 -- ==============================================================================
-
-USE [HRM_ENTERPRISE_DB];
-GO
 
 SET ANSI_NULLS ON;
 GO
@@ -60,7 +57,7 @@ BEGIN
         SET @CurDate = DATEADD(DAY, 1, @CurDate);
     END;
 
-    -- 3. Temporary table for special meal configurations extracted from WorkCalendar
+    -- 3. Temporary table for special meal configurations extracted from GA_WorkCalendar
     DECLARE @SpecialDays TABLE (
         CalendarDate DATE PRIMARY KEY,
         DayNumber INT,
@@ -80,7 +77,7 @@ BEGIN
         CASE WHEN wc.SpecialMealTypes LIKE '%NIGHT_DINNER%' THEN 1 ELSE 0 END,
         ISNULL(NULLIF(wc.SpecialMealPrice, 0), 30000),
         wc.SpecialMealNote
-    FROM WorkCalendar wc WITH (NOLOCK)
+    FROM GA_WorkCalendar wc WITH (NOLOCK)
     WHERE wc.CalendarDate BETWEEN @StartDate AND @EndDate
       AND wc.HasSpecialMeal = 1
       AND (wc.SpecialMealTypes LIKE '%DAY_LUNCH%' OR wc.SpecialMealTypes LIKE '%NIGHT_DINNER%');
@@ -92,14 +89,14 @@ BEGIN
     FROM @SpecialDays sd
     LEFT JOIN (
         SELECT o.OrderDate, SUM(o.DayLunchCount) AS TotalLunch
-        FROM DepartmentMealOrders o WITH (NOLOCK)
+        FROM GA_DepartmentMealOrders o WITH (NOLOCK)
         WHERE o.DepartmentCode NOT IN ('KOREAN', 'HAN')
           AND o.OrderDate BETWEEN @StartDate AND @EndDate
         GROUP BY o.OrderDate
     ) lunchAgg ON sd.CalendarDate = lunchAgg.OrderDate
     LEFT JOIN (
         SELECT o.OrderDate, SUM(o.NightDinnerCount) AS TotalDinner
-        FROM DepartmentMealOrders o WITH (NOLOCK)
+        FROM GA_DepartmentMealOrders o WITH (NOLOCK)
         WHERE o.DepartmentCode NOT IN ('KOREAN', 'HAN')
           AND o.OrderDate BETWEEN @StartDate AND @EndDate
         GROUP BY o.OrderDate
@@ -117,7 +114,7 @@ BEGIN
         @TotalVietDayOt = ISNULL(SUM(o.DayOtCount), 0),
         @TotalVietDinner = ISNULL(SUM(o.NightDinnerCount), 0),
         @TotalVietNightOt = ISNULL(SUM(o.NightOtCount), 0)
-    FROM DepartmentMealOrders o WITH (NOLOCK)
+    FROM GA_DepartmentMealOrders o WITH (NOLOCK)
     WHERE o.DepartmentCode NOT IN ('KOREAN', 'HAN')
       AND o.OrderDate BETWEEN @StartDate AND @EndDate;
 
@@ -132,7 +129,7 @@ BEGIN
         @TotalKoreanDayOt = ISNULL(SUM(o.DayOtCount), 0),
         @TotalKoreanDinner = ISNULL(SUM(o.NightDinnerCount), 0),
         @TotalKoreanNightOt = ISNULL(SUM(o.NightOtCount), 0)
-    FROM DepartmentMealOrders o WITH (NOLOCK)
+    FROM GA_DepartmentMealOrders o WITH (NOLOCK)
     WHERE o.DepartmentCode IN ('KOREAN', 'HAN')
       AND o.OrderDate BETWEEN @StartDate AND @EndDate;
 
@@ -245,8 +242,8 @@ BEGIN
         o.DayOtCount,
         o.NightDinnerCount,
         o.NightOtCount
-    FROM DepartmentMealOrders o WITH (NOLOCK)
-    LEFT JOIN Departments d WITH (NOLOCK) ON o.DepartmentCode = d.DepartmentCode
+    FROM GA_DepartmentMealOrders o WITH (NOLOCK)
+    LEFT JOIN GA_Departments d WITH (NOLOCK) ON o.DepartmentCode = d.DepartmentCode
     WHERE o.DepartmentCode NOT IN ('KOREAN', 'HAN')
       AND o.OrderDate BETWEEN @StartDate AND @EndDate
     ORDER BY o.DepartmentCode, o.OrderDate;
@@ -272,7 +269,7 @@ BEGIN
             SUM(o.DayOtCount) AS DayOtCount,
             SUM(o.NightDinnerCount) AS NightDinnerCount,
             SUM(o.NightOtCount) AS NightOtCount
-        FROM DepartmentMealOrders o WITH (NOLOCK)
+        FROM GA_DepartmentMealOrders o WITH (NOLOCK)
         WHERE o.DepartmentCode IN ('KOREAN', 'HAN')
           AND o.OrderDate BETWEEN @StartDate AND @EndDate
         GROUP BY o.OrderDate
