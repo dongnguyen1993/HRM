@@ -43,3 +43,12 @@ Tài liệu này là bộ quy chuẩn dành cho Cursor AI khi tham gia phát tri
 3. Kéo code: `git pull origin main` && `git submodule update --init --recursive`.
 4. Quy chuẩn commit: `[TÊN_DOMAIN]: [Mô tả]` (Ví dụ: `GA: Sửa tính toán suất ăn`, `HR: Thêm chấm công BioStar`, `ESS: Tối ưu phiếu lương`, `SYS: Cập nhật phân quyền`, `CHORE: Cập nhật tài liệu`).
 
+## 6. Phân Công & Cảnh Báo Tác Động Chéo Cho `huungociter` (GA Module)
+1. **Lập trình viên phụ trách GA:** `huungociter`.
+2. **Phạm vi code GA:**
+   - DB: Chỉ thao tác bảng `GA_*` (`GA_MealOrders`, `GA_WorkCalendar`, `GA_Departments`).
+   - Backend: `HRM.Backend/Domains/GA/` (API: `/api/ga/...`).
+   - Frontend: `HRM.Frontend/src/pages/GA/`.
+3. **CẢNH BÁO BẮT BUỘC DÀNH CHO AI:**
+   - Nếu yêu cầu của `huungociter` tác động ra ngoài phạm vi GA (sửa bảng/code của HR, SYS, ESS, Program.cs, middleware, shared layout, migration scripts...), AI **BẮT BUỘC PHẢI DỪNG LẠI HOẶC BẬT CẢNH BÁO RÕ RÀNG CHO HUUNGOCITER** trước khi thực hiện, chỉ rõ danh sách file bị ảnh hưởng và giải pháp an toàn chỉ cô lập trong GA.
+

@@ -126,11 +126,11 @@ Cách đặt này giúp toàn team nhìn vào lịch sử commit trên GitHub l�
 
 ---
 
-## 6. Mẫu Prompt Chuẩn Dành Cho Đồng Nghiệp Khi Dùng AI
-Khi đồng nghiệp bắt đầu prompt AI để code tính năng mới (ví dụ làm module GA), hãy copy đoạn ngữ cảnh mẫu này vào đầu phiên làm việc:
+## 6. Mẫu Prompt Chuẩn Dành Cho Đồng Nghiệp (`huungociter`) Khi Dùng AI
+Khi `huungociter` bắt đầu prompt AI để code tính năng mới cho module GA, hãy copy đoạn ngữ cảnh mẫu này vào đầu phiên làm việc:
 
 ```markdown
-Tôi đang phát triển phân hệ GA (Quản Trị Hành Chính) cho dự án HRM Enterprise.
+Tôi là huungociter, phụ trách phát triển phân hệ GA (Quản Trị Hành Chính) cho dự án HRM Enterprise.
 Hệ thống đã được chuẩn hóa theo các quy tắc trong file `AGENTS.md`:
 - Phân hệ GA gồm 3 bảng CSDL: GA_MealOrders, GA_WorkCalendar, GA_Departments.
 - Backend nằm tại: `HRM.Backend/Domains/GA/` (API route: `/api/ga/...`).
@@ -138,9 +138,33 @@ Hệ thống đã được chuẩn hóa theo các quy tắc trong file `AGENTS.m
 - Frontend nằm tại: `HRM.Frontend/src/pages/GA/`.
 - Phân quyền sử dụng các mã: 3001_GA_MEAL_MANAGEMENT, 3002_GA_WORK_CALENDAR, 3003_GA_DEPARTMENTS.
 - Tuyệt đối không tự ý chạy git push. Mọi câu lệnh SQL tiếng Việt phải có tiền tố N'...'.
+- QUAN TRỌNG: Nếu yêu cầu của tôi có tác động hoặc làm thay đổi các phân hệ khác (HR, SYS, ESS, cấu hình dùng chung), AI BẮT BUỘC phải cảnh báo rõ ràng cho tôi trước khi thực hiện!
 
 Yêu cầu hiện tại của tôi: [Mô tả tính năng bạn muốn AI hỗ trợ viết]
 ```
+
+---
+
+## 7. Phân Công Phụ Trách & Cơ Chế Cảnh Báo Tác Động Chéo (BẮT BUỘC CHO AI)
+
+1. **Phân công module:** Lập trình viên **`huungociter`** chịu trách nhiệm chính về phân hệ **GA (Quản Trị Hành Chính)**.
+2. **Quy tắc kiểm soát tác động chéo (Cross-Module Impact Protection):**
+   - Mọi mã nguồn mới cho GA phải được cô lập hoàn toàn trong:
+     - Database: Chỉ thao tác trên các bảng có tiền tố `GA_*` (`GA_MealOrders`, `GA_WorkCalendar`, `GA_Departments`).
+     - Backend: Chỉ thao tác trong `HRM.Backend/Domains/GA/` và route `/api/ga/...`.
+     - Frontend: Chỉ thao tác trong `HRM.Frontend/src/pages/GA/`.
+3. **CẢNH BÁO BẮT BUỘC DÀNH CHO AI:**
+   - Khi `huungociter` yêu cầu một tính năng hoặc chỉnh sửa mà **ảnh hưởng ra ngoài phạm vi GA**, bao gồm:
+     - Sửa các bảng của domain khác: `HR_*`, `SYS_*`, `ESS_*` (đặc biệt cấm tự ý sửa/truncate `SYS_ProgramMenus`, `SYS_AuthorGroupMapping`).
+     - Sửa code trong các thư mục domain khác: `Domains/HR/`, `Domains/SYS/`, `Domains/ESS/` hoặc `pages/HR/`, `pages/SYS/`, `pages/ESS/`.
+     - Sửa các file dùng chung toàn hệ thống: `Program.cs`, middleware, authentication/JWT, shared layouts, base types, migration scripts dùng chung...
+   - **Hành động bắt buộc của AI:**
+     AI **KHÔNG ĐƯỢC TỰ Ý SỬA ÂM THẦM**, mà phải xuất cảnh báo nổi bật:
+     > [!WARNING] **CẢNH BÁO TÁC ĐỘNG NGOÀI PHÂN HỆ GA (Gửi huungociter)**
+     > - **Vấn đề phát hiện:** Yêu cầu này sẽ làm thay đổi file / bảng dữ liệu thuộc phân hệ khác: `[Danh sách file/bảng]`.
+     > - **Rủi ro ảnh hưởng:** Có thể làm lỗi các tính năng đang hoạt động của phân hệ `[HR / SYS / ESS]`.
+     > - **Giải pháp an toàn đề xuất:** [Cách xử lý chỉ cô lập trong module GA, hoặc cần xác nhận trước từ chủ quản dự án].
+
 
 
 
