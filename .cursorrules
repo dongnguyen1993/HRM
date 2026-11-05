@@ -1,0 +1,45 @@
+# HRM Enterprise - Cursor AI Collaboration Rules
+
+Tài liệu này là bộ quy chuẩn dành cho Cursor AI khi tham gia phát triển dự án HRM Enterprise.
+
+## 1. Kiến Trúc Phân Hệ 3+1 Domains
+- **ESS** (`ESS_*`, `/ess/*`, Menu `1000..1005`): Cổng Tự Phục Vụ Nhân Viên.
+- **HR** (`HR_*`, `/hr/*`, Menu `2000..2010`): Quản Trị Nhân Sự.
+- **GA** (`GA_*`, `/ga/*`, Menu `3000..3003`): Quản Trị Hành Chính.
+- **SYS** (`SYS_*`, `/sys/*`, Menu `4000..4009`): Quản Trị Hệ Thống.
+
+## 2. Quy Chuẩn Cơ Sở Dữ Liệu & Bảng
+1. Bảng CSDL bắt buộc có tiền tố Domain:
+   - Phân hệ GA: `GA_MealOrders`, `GA_WorkCalendar`, `GA_Departments`.
+   - CẤM: Không dùng tên bảng cũ không có tiền tố (`MealOrders`, `WorkCalendar`, `Departments`).
+2. Bảng `SYS_ProgramMenus`: 31 màn hình cố định, ID từ 1 đến 31. Tuyệt đối không TRUNCATE.
+3. Mọi chuỗi tiếng Việt Unicode trong SQL phải có tiền tố `N'...'`.
+4. Script thực thi SQL chuẩn: `d:\HRM\scripts\execute_sql.ps1`.
+
+## 3. Quy Chuẩn Backend (.NET 8 & Dapper)
+1. Thư mục theo Domain: `HRM.Backend/Domains/{DOMAIN}/` (`Controllers/`, `Services/`, `Repositories/`, `Queries/`).
+2. API Route chuẩn: `/api/{domain-lowercase}/...` (Ví dụ: `/api/ga/meal-orders`).
+3. Dapper SQL lưu tại: `HRM.Backend/Domains/{DOMAIN}/Queries/{FeatureName}Queries.sql`.
+4. Quyền hạn Backend:
+   - `3001_GA_MEAL_MANAGEMENT` (alias `MEAL_MANAGEMENT`)
+   - `3002_GA_WORK_CALENDAR` (alias `WORK_CALENDAR`)
+   - `3003_GA_DEPARTMENTS`
+
+## 4. Quy Chuẩn Frontend (React / Ant Design / Vite)
+1. Thư mục UI đặt tại: `HRM.Frontend/src/pages/{DOMAIN}/`.
+2. Phân hệ GA gồm:
+   - `src/pages/GA/MealManagement/`
+   - `src/pages/GA/WorkCalendar/`
+   - `src/pages/GA/DepartmentList/`
+3. Gọi API qua reverse proxy: `/api/ga/...`.
+4. Không vi phạm React Hooks order (không gọi Hook sau return điều kiện).
+
+## 5. Quy Chuẩn Git (Git Submodules - BẮT BUỘC)
+1. Tuyệt đối KHÔNG tự ý chạy `git push`. Chỉ thực hiện khi người dùng yêu cầu rõ ràng.
+2. Thứ tự commit & push bắt buộc:
+   - Bước 1: `cd HRM.Backend` -> commit & push
+   - Bước 2: `cd HRM.Frontend` -> commit & push
+   - Bước 3: `cd ..` (Root `HRM`) -> `git add HRM.Backend HRM.Frontend scripts/` -> commit & push.
+3. Kéo code: `git pull origin main` && `git submodule update --init --recursive`.
+4. Quy chuẩn commit: `[TÊN_DOMAIN]: [Mô tả]` (Ví dụ: `GA: Sửa tính toán suất ăn`, `HR: Thêm chấm công BioStar`, `ESS: Tối ưu phiếu lương`, `SYS: Cập nhật phân quyền`, `CHORE: Cập nhật tài liệu`).
+

@@ -431,6 +431,19 @@ BEGIN TRY
     WHERE pm.UseFlag = 1 AND pm.ProgramGroup = 'ESS'
       AND NOT EXISTS (SELECT 1 FROM dbo.SYS_AuthorGroupMapping agm WHERE agm.GroupId = g.GroupId AND agm.ProgramId = pm.ProgramId);
 
+    -- --------------------------------------------------------------------------
+    -- 7. ĐỒNG BỘ TARGETLINK TRONG BẢNG SYS_NotificationEvents
+    -- --------------------------------------------------------------------------
+    IF OBJECT_ID('dbo.SYS_NotificationEvents', 'U') IS NOT NULL
+    BEGIN
+        UPDATE dbo.SYS_NotificationEvents SET TargetLink = '/ga/meal-management' WHERE EventCode IN ('MEAL_ORDER_SUBMITTED', 'MEAL_ORDER_ADJUSTED');
+        UPDATE dbo.SYS_NotificationEvents SET TargetLink = '/hr/timeoff-requests' WHERE EventCode IN ('TIMEOFF_REQUEST_CREATED', 'TIMEOFF_REQUEST_PROCESSED');
+        UPDATE dbo.SYS_NotificationEvents SET TargetLink = '/ess/my-payslip' WHERE EventCode = 'PAYROLL_PUBLISHED';
+        UPDATE dbo.SYS_NotificationEvents SET TargetLink = '/sys/permission-mapping' WHERE EventCode = 'PERMISSION_CHANGED';
+        UPDATE dbo.SYS_NotificationEvents SET TargetLink = '/sys/announcements' WHERE EventCode = 'ANNOUNCEMENT_NEW';
+        PRINT N'[SYS] Đã đồng bộ TargetLink trong SYS_NotificationEvents';
+    END
+
     COMMIT TRANSACTION;
     PRINT N'✅ Đã đồng bộ hoàn hảo toàn bộ Menu và Phân quyền CSDL sang chuẩn Domain 3+1!';
 END TRY
@@ -439,3 +452,4 @@ BEGIN CATCH
     DECLARE @ErrMsg NVARCHAR(4000) = ERROR_MESSAGE();
     RAISERROR(N'❌ Lỗi khi đồng bộ Menu & Phân quyền: %s', 16, 1, @ErrMsg);
 END CATCH;
+
