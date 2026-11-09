@@ -7,7 +7,15 @@ param (
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
-$appSettings = Get-Content "d:\HRM\HRM.Backend\HRM.Backend\appsettings.json" -Encoding UTF8 | ConvertFrom-Json
+$settingsPaths = @(
+    "D:\HRM\HRM-SOURCE\HRM_BackEnd\HRM.Backend\appsettings.json",
+    "d:\HRM\HRM.Backend\HRM.Backend\appsettings.json"
+)
+$appSettingsFile = $settingsPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
+if (-not $appSettingsFile) {
+    throw "Không tìm thấy appsettings.json tại các đường dẫn quy định!"
+}
+$appSettings = Get-Content $appSettingsFile -Encoding UTF8 | ConvertFrom-Json
 $connStr = $appSettings.ConnectionStrings.DefaultConnection
 
 $conn = New-Object System.Data.SqlClient.SqlConnection($connStr)

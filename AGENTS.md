@@ -11,14 +11,14 @@ Hệ thống đã được quy hoạch thành 4 Domain độc lập và rõ ràn
 |:---|:---:|:---:|:---:|:---|
 | **ESS** | `ESS_*` | `/ess/*` | `1000..1005` | Cổng Tự Phục Vụ Nhân Viên (User Overview, Lịch làm việc, Bảng công, Đăng ký suất ăn, Phiếu lương) |
 | **HR**  | `HR_*`  | `/hr/*`  | `2000..2010` | Quản Trị Nhân Sự (Phòng ban, Hợp đồng, Nghỉ phép, Bảng lương, Ca kíp, Chấm công BioStar, OT, Báo cáo) |
-| **GA**  | `GA_*`  | `/ga/*`  | `3000..3003` | Quản Trị Hành Chính (Quản lý suất ăn Canteen, Lịch nhà máy & ca ăn, Danh mục phòng ban đặt cơm) |
+| **GA**  | `GA_*`  | `/ga/*`  | `3000..3006` | Quản Trị Hành Chính (Suất ăn Canteen, Lịch nhà máy, Phòng ban đặt cơm, Đăng ký khách vào cổng, Duyệt khách, Kiểm soát Cổng) |
 | **SYS** | `SYS_*` | `/sys/*` | `4000..4009` | Quản Trị Hệ Thống (Người dùng, Phân quyền, Quản lý Menu, Mã dùng chung, Audit Logs, Thông báo, Thiết bị) |
 
 ---
 
 ## 2. Quy Chuẩn Cơ Sở Dữ Liệu & Bảng (Database Schema)
 1. **Tiền tố bảng bắt buộc:** Tất cả các bảng CSDL phải có tiền tố Domain:
-   - Phân hệ GA: `GA_MealOrders`, `GA_WorkCalendar`, `GA_Departments`.
+   - Phân hệ GA: `GA_MealOrders`, `GA_WorkCalendar`, `GA_Departments`, `GA_VisitorRegistrations`, `GA_VisitorDetails`.
    - Phân hệ HR: `HR_Departments`, `HR_LaborContracts`, `HR_LeaveTypes`, `HR_PayrollPeriods`, `HR_ShiftSetup`, `HR_TimeOffRequests`, `HR_OvertimeRegistrations`, `HR_BiostarMachineRecords`, `HR_WorkSummaries`, `HR_WorkTimeReports`...
    - Phân hệ SYS: `SYS_Users`, `SYS_ProgramMenus`, `SYS_AuthorGroups`, `SYS_AuthorGroupMapping`, `SYS_CommonCodes`, `SYS_AuditLogs`, `SYS_SignInLogs`, `SYS_Announcements`, `SYS_NotificationEvents`, `SYS_DeviceSetups`...
    - Phân hệ ESS: Dùng chung bảng dữ liệu từ các domain nghiệp vụ với view cá nhân hóa.

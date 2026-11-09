@@ -1,14 +1,72 @@
-# 📋 BÁO CÁO KIỂM ĐỊNH DỰ ÁN HRM (PROJECT AUDIT)
+﻿# 📋 BÁO CÁO KIỂM ĐỊNH DỰ ÁN HRM (PROJECT AUDIT)
 
 > **Người thực hiện:** Senior Fullstack Architect (AI Review)  
 > **Ngày kiểm định ban đầu:** 2026-09-04  
-> **Cập nhật lần cuối:** 2026-10-15 (Phiên 15-10-2026: Tổng rà soát, kiểm tra chất lượng Audit & QA toàn diện 5 phân hệ trọng yếu — Bảo mật, Token, Quản trị hệ thống, Hành chính GA, Self-Service suất ăn và Đa ngôn ngữ — Sửa triệt để 100% lỗi TypeScript Frontend `npx tsc --noEmit` & `npm run build` PASS — Backend `dotnet build -c Release` 0 errors, 54/54 Unit Tests PASS)  
+> **Cập nhật lần cuối:** 2026-11-09 (Phiên 09-11-2026: Cập nhật cấu trúc thư mục chuẩn hóa HRM-SOURCE theo phân hệ GA huungociter; Quy hoạch kiến trúc 3 chặng & CSDL tính năng Đăng ký khách vào cổng Visitor Registration 3004..3006; Tạo migration V20261107_01) (Phiên 15-10-2026: Tổng rà soát, kiểm tra chất lượng Audit & QA toàn diện 5 phân hệ trọng yếu — Bảo mật, Token, Quản trị hệ thống, Hành chính GA, Self-Service suất ăn và Đa ngôn ngữ — Sửa triệt để 100% lỗi TypeScript Frontend `npx tsc --noEmit` & `npm run build` PASS — Backend `dotnet build -c Release` 0 errors, 54/54 Unit Tests PASS)  
 > **Phạm vi:** Toàn bộ monorepo `d:\HRM` — gồm `HRM.Backend` (.NET 8), `HRM.Frontend` (UmiJS/React), `HRM.Backend.Tests` (xUnit), Docker Containerization và Database SQL Server  
 > **Trạng thái tổng quan:** 🟢 **HỆ THỐNG ĐẠT CHUẨN PRODUCTION-READY (100%) — Hoàn thiện toàn diện 5 phân hệ cốt lõi; Khắc phục triệt để lỗi biên dịch TypeScript; Chuẩn hóa alias routes `/system/*` và đồng bộ ma trận quyền RBAC; Silent token rotation, Password rotation policy, Multi-department meal protection hoạt động hoàn hảo.**
 
 ---
 
-## 🌟 PHIÊN LÀM VIỆC MỚI NHẤT: SESSION 15-10-2026 — TỔNG RÀ SOÁT, KIỂM ĐỊNH CHẤT LƯỢNG (AUDIT & QA) VÀ VÁ LỖI TOÀN HỆ THỐNG
+## 🌟 PHIÊN LÀM VIỆC MỚI NHẤT: SESSION 09-11-2026 — CẬP NHẬT CẤU TRÚC ĐƯỜNG DẪN DỰ ÁN & QUY HOẠCH PHÂN HỆ GA (VISITOR REGISTRATION)
+
+### 1. Cập Nhật Chuẩn Hóa Cấu Trúc Đường Dẫn Toàn Dự Án
+Theo yêu cầu cập nhật từ lập trình viên phụ trách GA (huungociter), toàn bộ cấu trúc dự án HRM Enterprise được định vị và đồng bộ hóa tại các đường dẫn thực tế sau:
+- **Mã nguồn Backend:** `D:\HRM\HRM-SOURCE\HRM_BackEnd\HRM.Backend\`
+  - Công nghệ: .NET 8 Web API, Dapper ORM thuần (raw SQL), DapperContext quản lý kết nối cơ sở dữ liệu.
+  - Quản lý truy vấn: QueryHelper.GetSql() nạp các file truy vấn SQL thuần từ thư mục Data/Queries/.
+  - Phân hệ General Affairs (GA):
+    - Controllers: Controllers/GeneralAffairs/
+    - DTOs: Core/DTOs/Requests/ và Core/DTOs/Responses/
+    - Interfaces: Core/Interfaces/GeneralAffairs/
+    - Queries: Data/Queries/GeneralAffairs/*.sql
+    - Repositories: Data/Repositories/GeneralAffairs/
+    - Services: Services/GeneralAffairs/
+  - Xử lý Excel: Thư viện MiniExcel tối ưu bộ nhớ RAM thông qua lớp tiện ích dùng chung HRM.Backend.Common.ExcelHelper.
+- **Mã nguồn Frontend:** `D:\HRM\HRM-SOURCE\HRM_Frontend\src\`
+  - Công nghệ: React 18, UmiJS Max, Ant Design 5, @ant-design/pro-components (PageContainer, ProTable...).
+  - Quản lý gọi API: Thư viện `request` tích hợp từ `@umijs/max`.
+  - Phân hệ General Affairs (GA): Tập trung toàn bộ giao diện trong src/pages/GeneralAffairs/.
+- **Scripts Cơ sở dữ liệu:**
+  - Thư mục quản lý scripts: scripts/ (đặt tại thư mục làm việc dự án).
+  - Công cụ thực thi: PowerShell script scripts/execute_sql.ps1 (đã nâng cấp cơ chế tự động phân giải cấu hình chuỗi kết nối từ `D:\HRM\HRM-SOURCE\HRM_BackEnd\HRM.Backend\appsettings.json` với bảng mã UTF-8).
+
+### 2. Quy Tắc Bất Di Bất Dịch Cho Phân Hệ GA (Quản Trị Hành Chính)
+1. **Phạm vi cô lập cơ sở dữ liệu:** Mọi bảng dữ liệu mới thuộc nghiệp vụ GA bắt buộc phải có tiền tố GA_* (GA_VisitorRegistrations, GA_VisitorDetails).
+2. **Không phá vỡ danh mục Menu & Quyền hạn:**
+   - Bảng SYS_ProgramMenus đã được cố định các màn hình từ 3001 đến 3003 cho phân hệ GA.
+   - Bổ sung 3 màn hình mới cho GA có mã ProgramKey tuần tự:
+     - 3004_GA_VISITOR_REGISTRATION: Đăng ký khách vào cổng (Dành cho nhân viên các phòng ban).
+     - 3005_GA_VISITOR_APPROVAL: Duyệt đăng ký khách vào cổng (Phân quyền cho GA Officer & Admin).
+     - 3006_GA_VISITOR_GATE: Kiểm soát Cổng bảo vệ (Dành cho Security / Chốt bảo vệ, tối ưu tablet/kiosk).
+   - **Tuyệt đối không TRUNCATE** bảng menu SYS_ProgramMenus hay phân quyền SYS_AuthorGroupMapping. Mọi thao tác bổ sung menu/quyền phải sử dụng lệnh INSERT có kiểm tra tính Idempotent (IF NOT EXISTS).
+3. **Tiếng Việt Unicode:** Mọi chuỗi tiếng Việt Unicode trong câu lệnh SQL bắt buộc có tiền tố N'...'.
+4. **Quy chuẩn Git:** Không tự ý git push, chỉ commit/push khi có lệnh rõ ràng.
+
+### 3. Quy Hoạch Nghiệp Vụ Tính Năng "Đăng Ký Khách Vào Cổng" (Visitor Registration)
+Tính năng chuẩn hóa theo mô hình nhà máy Hansol/MES, gồm 3 chặng độc lập và liền mạch:
+1. **Chặng 1 - Đăng ký (Nhân viên / Phòng ban):**
+   - Các bộ phận (EHS, PUR, QC, IT, KTSX...) lập phiếu đăng ký khách đến làm việc (gặp gỡ, bảo trì, thi công công trình, audit...).
+   - Hỗ trợ 2 hình thức: Ngắn hạn trong ngày (DAILY) hoặc Dài hạn nhiều ngày (LONG_TERM).
+   - Hỗ trợ nhập trực tiếp trên bảng động hoặc import danh sách từ file Excel mẫu.
+   - Trạng thái khởi tạo: PENDING (chờ duyệt).
+2. **Chặng 2 - Phê duyệt (Bộ phận GA - Hành chính):**
+   - Cán bộ GA thẩm định hồ sơ khách, đối tác, an toàn và mục đích ra vào.
+   - Thực hiện Phê duyệt (APPROVE) hoặc Từ chối (REJECT kèm lý do), hỗ trợ duyệt đơn lẻ hoặc duyệt hàng loạt (Batch Approve).
+3. **Chặng 3 - Kiểm soát Cổng (Bảo vệ - Security Gate):**
+   - Màn hình chuyên dụng cho chốt bảo vệ (tối ưu tablet/màn hình cảm ứng chạm).
+   - Tự động lọc danh sách khách đã được APPROVED trong khung ngày hiệu lực (VisitDateFrom <= CURRENT_DATE <= VisitDateTo).
+   - Tìm kiếm nhanh tức thì theo CCCD/Hộ chiếu, Tên khách hoặc Nhà cung cấp / Công ty.
+   - Thao tác 1 chạm Check-in (VÀO) và Check-out (RA), ghi nhận chính xác thời gian thực tế và mã nhân viên bảo vệ thao tác.
+   - Xuất báo cáo ngày cho bảo vệ theo đúng biểu mẫu Excel Hansol (2 phần: Khách thực tế đã vào và Khách theo kế hoạch chưa vào).
+
+### 4. File Migration Đã Xuất Sẵn Sàng Triển Khai
+- Script migration chuẩn: scripts/V20261107_01__Create_GA_Visitor_Registration_Tables_And_Menus.sql
+- Đầy đủ định nghĩa bảng dbo.GA_VisitorRegistrations, dbo.GA_VisitorDetails, khóa ngoại CASCADE, indexes hiệu năng, chèn menu 3004..3006 và phân quyền tự động cho Admin, GA Officer và Người dùng toàn hệ thống.
+
+---
+
+## 🌟 PHIÊN LÀM VIỆC: SESSION 15-10-2026 — TỔNG RÀ SOÁT, KIỂM ĐỊNH CHẤT LƯỢNG (AUDIT & QA) VÀ VÁ LỖI TOÀN HỆ THỐNG
 
 ### 1. Kết Quả Kiểm Tra Biên Dịch & Kiểm Thử Toàn Diện
 - **Backend (.NET 8):** `dotnet build -c Release` thành công **0 Warning(s), 0 Error(s)**.
