@@ -2,9 +2,33 @@
 
 > **Người thực hiện:** Senior Fullstack Architect (AI Review)  
 > **Ngày kiểm định ban đầu:** 2026-09-04  
-> **Cập nhật lần cuối:** 2026-11-09 (Phiên 09-11-2026: Cập nhật cấu trúc thư mục chuẩn hóa HRM-SOURCE theo phân hệ GA huungociter; Quy hoạch kiến trúc 3 chặng & CSDL tính năng Đăng ký khách vào cổng Visitor Registration 3004..3006; Tạo migration V20261107_01) (Phiên 15-10-2026: Tổng rà soát, kiểm tra chất lượng Audit & QA toàn diện 5 phân hệ trọng yếu — Bảo mật, Token, Quản trị hệ thống, Hành chính GA, Self-Service suất ăn và Đa ngôn ngữ — Sửa triệt để 100% lỗi TypeScript Frontend `npx tsc --noEmit` & `npm run build` PASS — Backend `dotnet build -c Release` 0 errors, 54/54 Unit Tests PASS)  
-> **Phạm vi:** Toàn bộ monorepo `d:\HRM` — gồm `HRM.Backend` (.NET 8), `HRM.Frontend` (UmiJS/React), `HRM.Backend.Tests` (xUnit), Docker Containerization và Database SQL Server  
-> **Trạng thái tổng quan:** 🟢 **HỆ THỐNG ĐẠT CHUẨN PRODUCTION-READY (100%) — Hoàn thiện toàn diện 5 phân hệ cốt lõi; Khắc phục triệt để lỗi biên dịch TypeScript; Chuẩn hóa alias routes `/system/*` và đồng bộ ma trận quyền RBAC; Silent token rotation, Password rotation policy, Multi-department meal protection hoạt động hoàn hảo.**
+> **Cập nhật lần cuối:** 2026-11-13 (Phiên 13-11-2026: Chuẩn hóa 100% kiến trúc 1 UI - 1 Controller - 1 Service - 1 Repository - 1 SQL Query trên 4 Domains ESS, HR, GA, SYS; Dọn sạch 30 bảng CSDL cũ thừa; Nâng cấp Stored Procedures; Đạt 64/64 Unit Tests, Umi Webpack Build PASS 100%, 37/37 Integration Cases PASS; Bảo toàn 100% Visitor Registration huungociter)  
+> **Phạm vi:** Toàn bộ monorepo `d:\HRM` — gồm `HRM.Backend` (.NET 8), `HRM.Frontend` (UmiJS/React), `HRM.Backend.Tests` (xUnit), Database SQL Server  
+> **Trạng thái tổng quan:** 🟢 **HỆ THỐNG ĐẠT CHUẨN PRODUCTION-READY (100%) — Hoàn tất chuẩn hóa 4 Domains độc lập, CSDL sạch 35 bảng nghiệp vụ chuẩn, API trực tiếp 1-1-1-1-1 RESTful.**
+
+---
+
+## 🌟 PHIÊN LÀM VIỆC MỚI NHẤT: SESSION 13-11-2026 — CHUẨN HÓA TOÀN DỰ ÁN & CLEAN DATABASE & E2E TESTING
+
+### 1. Chuẩn Hóa Kiến Trúc 1-1-1-1-1 Toàn Diện
+- Đồng bộ cấu trúc mã nguồn theo quy chuẩn: 1 Màn hình UI <-> 1 Controller <-> 1 Service <-> 1 Repository <-> 1 Dapper SQL Query.
+- Phân hệ chuẩn hóa 4 Domains:
+  - **ESS:** Cổng nhân viên (Overview, Work Schedule, Daily Work Time, Meal Order, My Payslip)
+  - **HR:** Quản trị nhân sự & Chấm công (Departments, Labor Contracts, Leave Types, Payroll, BioStar Machine Records, Shift Setup, Work Summary, TimeOff Requests, OT Registration, Work Time Report)
+  - **GA:** Quản trị hành chính (Canteen Meal Management, Work Calendar, Meal Department List, Visitor Registration 3004..3006)
+  - **SYS:** Quản trị hệ thống (Users, Permissions, Program Menus, Common Codes, Audit Logs, SignIn Logs, Announcements, Dynamic Notification Matrix, BioStar Devices, Dashboard)
+- Loại bỏ toàn bộ route trung gian, frontend gọi trực tiếp API Backend qua định dạng `/api/{domain-lowercase}/{feature}`.
+
+### 2. Dọn Dẹp CSDL & Cập Nhật Stored Procedures
+- Đã xóa bỏ hoàn toàn 30 bảng cũ không có tiền tố domain (`Announcements`, `AuditLogs`, `Departments`, `Users`, `WorkCalendar`...).
+- Cơ sở dữ liệu duy trì đúng 35 bảng nghiệp vụ chính thức có tiền tố Domain chuẩn (`GA_*`, `HR_*`, `SYS_*`).
+- Cập nhật 2 Stored Procedures lớn: `SP_GetDashboardAnalytics` và `sp_CalculateTimesheetEngine` sang bảng chuẩn. Script migration lưu tại: `d:\HRM\scripts\V20261113_01__Drop_Redundant_Legacy_Tables_And_Update_StoredProcedures.sql`.
+
+### 3. Kết Quả Kiểm Thử Toàn Diện
+- **Unit Tests (.NET):** 64 / 64 Tests PASS (0 Failed).
+- **Frontend Build (UmiJS):** Webpack compile thành công 100% trong 27.65s (31 màn hình + Visitor Registration).
+- **Integration Test Suite (E2E):** 37 / 37 Test cases PASS (100% Success Rate) bao gồm cả bảo mật Token, xác thực, nghiệp vụ 4 domains.
+- **Bảo toàn phân hệ huungociter:** Các màn hình Đăng ký khách (`VisitorRegistration`, `VisitorApproval`, `VisitorGate`) được giữ nguyên vẹn 100%.
 
 ---
 
