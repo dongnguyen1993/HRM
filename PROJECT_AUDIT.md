@@ -1,4 +1,4 @@
-﻿# 📋 BÁO CÁO KIỂM ĐỊNH DỰ ÁN HRM (PROJECT AUDIT)
+# 📋 BÁO CÁO KIỂM ĐỊNH DỰ ÁN HRM (PROJECT AUDIT)
 
 > **Người thực hiện:** Senior Fullstack Architect (AI Review)  
 > **Ngày kiểm định ban đầu:** 2026-09-04  

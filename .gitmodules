@@ -1,0 +1,7 @@
+[submodule "HRM.Backend"]
+	path = HRM.Backend
+	url = https://github.com/dongnguyen1993/HRM_BackEnd.git
+[submodule "HRM.Frontend"]
+	path = HRM.Frontend
+	url = https://github.com/dongnguyen1993/HRM_Frontend.git
+
