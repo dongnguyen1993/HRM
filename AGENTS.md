@@ -33,7 +33,7 @@ Mỗi chức năng nghiệp vụ độc lập được thiết kế tương ứn
 1. **35 Bảng nghiệp vụ chuẩn hóa có tiền tố Domain:**
    - Cơ sở dữ liệu đã dọn dẹp sạch toàn bộ 30 bảng cũ không có tiền tố. Hiện tại chỉ duy trì đúng **35 bảng chính thức** có tiền tố rõ ràng:
      - **Phân hệ GA:** `GA_Departments`, `GA_MealOrders`, `GA_WorkCalendar`, `GA_VisitorRegistrations`, `GA_VisitorDetails`.
-     - **Phân hệ HR:** `HR_Departments`, `HR_LaborContracts`, `HR_LeaveTypes`, `HR_PayrollPeriods`, `HR_PayrollSalaryItem`, `HR_PayrollEmployeeMonthly`, `HR_ShiftSetup`, `HR_TimeOffRequests`, `HR_OvertimeRegistrations`, `HR_BiostarMachineRecords`, `HR_WorkSummaries`, `HR_WorkTimeReports`...
+     - **Phân hệ HR:** `HR_Departments`, `HR_LaborContracts`, `HR_LeaveTypes`, `HR_PayrollPeriods`, `HR_PayrollSalaryItem`, `HR_PayrollEmployeeMonthly`, `HR_PositionsRole`, `HR_PositionsGrade`, `HR_ShiftSetup`, `HR_TimeOffRequests`, `HR_OvertimeRegistrations`, `HR_BiostarMachineRecords`, `HR_WorkSummaries`, `HR_WorkTimeReports`...
      - **Phân hệ SYS:** `SYS_Users`, `SYS_UserGroupMapping`, `SYS_UserTokens`, `SYS_UserThemeSettings`, `SYS_UserAttachments`, `SYS_ProgramMenus`, `SYS_AuthorGroups`, `SYS_AuthorGroupMapping`, `SYS_CommonCodes`, `SYS_AuditLogs`, `SYS_SignInLogs`, `SYS_Announcements`, `SYS_NotificationEvents`, `SYS_Notifications`, `SYS_DeviceSetups`, `SYS_SystemSettings`...
      - **Phân hệ ESS:** Sử dụng chung dữ liệu bảo mật từ các domain nghiệp vụ với view cá nhân hóa qua `UserCode`.
    - **CẤM:** Tuyệt đối không tạo mới hoặc truy vấn vào các tên bảng cũ không có tiền tố (như `MealOrders`, `Departments`, `Users`, `ProgramMenus`...).
@@ -75,7 +75,7 @@ Mỗi chức năng nghiệp vụ độc lập được thiết kế tương ứn
      - Màn hình Suất ăn GA: `[HasPermission("3001_GA_MEAL_MANAGEMENT")]`
      - Màn hình Lịch làm việc: `[HasPermission("3002_GA_WORK_CALENDAR")]`
      - Màn hình Phòng ban GA: `[HasPermission("3003_GA_DEPARTMENTS")]`
-     - Màn hình Đăng ký khách: `[HasPermission("3004_GA_VISITOR_REGISTRATION")]`
+     - Màn hình Đăng ký khách (ESS): `[HasPermission("1006_ESS_VISITOR_REGISTRATION")]`
      - Màn hình Duyệt khách: `[HasPermission("3005_GA_VISITOR_APPROVAL")]`
      - Màn hình Cổng bảo vệ: `[HasPermission("3006_GA_VISITOR_GATE")]`
 
@@ -89,9 +89,15 @@ Mỗi chức năng nghiệp vụ độc lập được thiết kế tương ứn
      - `src/pages/GA/MealManagement/` (Quản lý suất ăn, chốt cơm Canteen)
      - `src/pages/GA/WorkCalendar/` (Lịch làm việc nhà máy & suất ăn)
      - `src/pages/GA/DepartmentList/` (Danh sách phòng ban đặt cơm)
-     - `src/pages/GeneralAffairs/VisitorRegistration/` (Đăng ký khách vào cổng - Phụ trách: `huungociter`)
-     - `src/pages/GeneralAffairs/VisitorApproval/` (Duyệt đăng ký khách - Phụ trách: `huungociter`)
-     - `src/pages/GeneralAffairs/VisitorGate/` (Kiểm soát cổng bảo vệ - Phụ trách: `huungociter`)
+     - `src/pages/GA/VisitorApproval/` (Duyệt đăng ký khách - Phụ trách: `huungociter`)
+     - `src/pages/GA/VisitorGate/` (Kiểm soát cổng bảo vệ - Phụ trách: `huungociter`)
+   - Phân hệ ESS gồm:
+     - `src/pages/ESS/UserOverview/` (User Overview - 1001)
+     - `src/pages/ESS/WorkSchedule/` (Lịch làm việc của tôi - 1002)
+     - `src/pages/ESS/DailyWorkTime/` (Bảng công hàng ngày - 1003)
+     - `src/pages/ESS/MealOrder/` (Đăng ký suất ăn - 1004)
+     - `src/pages/ESS/MyPayslip/` (Phiếu lương của tôi - 1005)
+     - `src/pages/ESS/VisitorRegistration/` (Đăng ký khách vào cổng - 1006 - Phụ trách: `huungociter`)
 2. **Gọi API:**
    - Mọi service gọi API thông qua reverse proxy: `/api/{domain-lowercase}/...`.
 3. **Dọn dẹp code dư thừa:**
@@ -164,8 +170,8 @@ Hệ thống đã được chuẩn hóa theo các quy tắc trong file `AGENTS.m
 - Phân hệ GA gồm các bảng CSDL: GA_MealOrders, GA_WorkCalendar, GA_Departments, GA_VisitorRegistrations, GA_VisitorDetails.
 - Backend nằm tại: `HRM.Backend/Domains/GA/` (API route: `/api/ga/...`).
 - Dapper SQL nằm tại: `HRM.Backend/Domains/GA/Queries/*.sql`.
-- Frontend nằm tại: `HRM.Frontend/src/pages/GA/` và `HRM.Frontend/src/pages/GeneralAffairs/`.
-- Phân quyền sử dụng các mã: 3001_GA_MEAL_MANAGEMENT, 3002_GA_WORK_CALENDAR, 3003_GA_DEPARTMENTS, 3004_GA_VISITOR_REGISTRATION, 3005_GA_VISITOR_APPROVAL, 3006_GA_VISITOR_GATE.
+- Frontend nằm tại: `HRM.Frontend/src/pages/GA/` (và view cá nhân `src/pages/ESS/VisitorRegistration/`).
+- Phân quyền sử dụng các mã: 1006_ESS_VISITOR_REGISTRATION, 3001_GA_MEAL_MANAGEMENT, 3002_GA_WORK_CALENDAR, 3003_GA_DEPARTMENTS, 3005_GA_VISITOR_APPROVAL, 3006_GA_VISITOR_GATE.
 - Tuyệt đối không tự ý chạy git push. Mọi câu lệnh SQL tiếng Việt phải có tiền tố N'...'.
 - QUAN TRỌNG: Nếu yêu cầu của tôi có tác động hoặc làm thay đổi các phân hệ khác (HR, SYS, ESS, cấu hình dùng chung), AI BẮT BUỘC phải cảnh báo rõ ràng cho tôi trước khi thực hiện!
 
@@ -181,7 +187,7 @@ Yêu cầu hiện tại của tôi: [Mô tả tính năng bạn muốn AI hỗ t
    - Mọi mã nguồn mới cho GA phải được cô lập hoàn toàn trong:
      - Database: Chỉ thao tác trên các bảng có tiền tố `GA_*` (`GA_MealOrders`, `GA_WorkCalendar`, `GA_Departments`, `GA_VisitorRegistrations`, `GA_VisitorDetails`).
      - Backend: Chỉ thao tác trong `HRM.Backend/Domains/GA/` và route `/api/ga/...`.
-     - Frontend: Chỉ thao tác trong `HRM.Frontend/src/pages/GA/` hoặc `src/pages/GeneralAffairs/`.
+     - Frontend: Chỉ thao tác trong `HRM.Frontend/src/pages/GA/` (và `src/pages/ESS/VisitorRegistration/`).
 3. **CẢNH BÁO BẮT BUỘC DÀNH CHO AI:**
    - Khi `huungociter` yêu cầu một tính năng hoặc chỉnh sửa mà **ảnh hưởng ra ngoài phạm vi GA**, bao gồm:
      - Sửa các bảng của domain khác: `HR_*`, `SYS_*`, `ESS_*` (đặc biệt cấm tự ý sửa/truncate `SYS_ProgramMenus`, `SYS_AuthorGroupMapping`).
