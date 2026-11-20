@@ -10,7 +10,7 @@
 SET NOCOUNT ON;
 
 UPDATE dbo.SYS_Users
-SET PasswordHash = '$2a$11$lSvR6ZvCc72Hhk0lxw63uudbJN1VoEdw7SBsB/xmmKt9SWcBlzXlK',
+SET PasswordHash = '$2a$11$UAXU2BskRsWi75e8bb1dCOA44DU2PtcAXqJm8egfu1pyYEwcF3e.2',
     Comment = '0',
     Status = 1,
     MustChangePassword = 0,

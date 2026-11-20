@@ -103,6 +103,12 @@ Mỗi chức năng nghiệp vụ độc lập được thiết kế tương ứn
 3. **Dọn dẹp code dư thừa:**
    - Đã loại bỏ hoàn toàn các file mock không dùng (`mock/userAPI.ts`), các trang dynamic không dùng (`DynamicScreen`), và module HRM cũ (`src/pages/Hrm/...`).
    - Mọi component mới phải đảm bảo thứ tự React Hooks chuẩn và không import dư thừa.
+4. **Chuẩn Hóa Giao Diện Bảng Dữ Liệu (BẮT BUỘC ƯU TIÊN SỬ DỤNG `BaseTable`):**
+   - Khi tạo mới hoặc tái cấu trúc bất kỳ màn hình danh sách / bảng dữ liệu (Table/Grid) nào trong toàn bộ dự án, **BẮT BUỘC ưu tiên sử dụng bộ component chuẩn dùng chung**:
+     1. **`BaseTable` (`@/components/BaseTable`):** Component bảng dữ liệu trung tâm chuẩn hóa của hệ thống (kết hợp Ant Design Table, resizable headers, highlight dòng được chọn, tự động phân giải cột STT, hỗ trợ Show SQL trace qua `queryFile` & `queryKey`).
+     2. **`TableFilterCard` (`@/components/TableFilterCard`):** Card bộ lọc tìm kiếm tiêu chuẩn phía trên bảng, tối giản nút tìm kiếm bằng icon (`iconOnly={true}`), mặc định ẩn nút reset (`showReset={false}`).
+     3. **`TableActionBar` (`@/components/TableActionBar`):** Thanh công cụ tác vụ chuẩn hóa (Thêm mới, Sửa, Xóa mềm bulk-delete) tích hợp chặt chẽ với hệ thống phân quyền 6 cấp (`useActionAccess`).
+   - **CẤM:** Không tự ý viết lại table tùy biến bằng Ant Design thô hoặc ProTable độc lập khi chưa có sự đồng ý của Tech Lead.
 
 ---
 
