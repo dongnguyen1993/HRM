@@ -14,6 +14,9 @@ try {
         Authorization = "Bearer $token"
     }
 
+    # Ensure clean state before running test
+    & 'd:\HRM\scripts\execute_sql.ps1' -sqlCommand "DELETE FROM dbo.SYS_UserGroupMapping WHERE UserId IN (SELECT UserId FROM dbo.SYS_Users WHERE UserCode = '9999001'); DELETE FROM dbo.SYS_Users WHERE UserCode = '9999001'; DELETE FROM dbo.HR_Employees WHERE UserCode = '9999001';" | Out-Null
+
     # 1. Test GET /api/hr/employees (paged)
     $paged = Invoke-RestMethod -Uri 'http://localhost:7014/api/hr/employees?pageNumber=1&pageSize=5' -Method Get -Headers $headers
     Write-Host "[API 1 SUCCESS] GET /api/hr/employees: TotalRecords = $($paged.totalRecords), PageSize = $($paged.pageSize), ItemCount = $($paged.data.Count)"

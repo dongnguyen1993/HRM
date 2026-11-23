@@ -70,7 +70,14 @@ Mỗi chức năng nghiệp vụ độc lập được thiết kế tương ứn
 3. **Dapper SQL:**
    - Toàn bộ câu lệnh SQL thuần được lưu tại file riêng: `HRM.Backend/Domains/{DOMAIN}/Queries/{FeatureName}Queries.sql`.
    - Trong SQL, luôn chỉ định rõ schema và tên bảng chuẩn: `dbo.GA_MealOrders`, `dbo.GA_WorkCalendar`, `dbo.HR_Departments`...
-4. **Kiểm tra Phân quyền (Authorization):**
+4. **Kiểm tra Phân quyền (Authorization & 5 Quyền Chuẩn CRUD):**
+   - Hệ thống chuẩn hóa duy nhất **5 quyền chức năng chuẩn CRUD** trên toàn bộ CSDL, Backend và Frontend:
+     1. `IsSearch` / `canSearch`: Quyền tìm kiếm, xem dữ liệu và truy cập màn hình.
+     2. `IsCreate` / `canCreate`: Quyền thêm mới bản ghi.
+     3. `IsUpdate` / `canUpdate`: Quyền cập nhật, chỉnh sửa dữ liệu bản ghi đã có.
+     4. `IsDelete` / `canDelete`: Quyền xóa dữ liệu (xóa mềm hoặc xóa vật lý).
+     5. `IsPrint` / `canPrint`: Quyền in ấn và xuất báo cáo Excel/PDF.
+   - **CẤM:** Tuyệt đối không sử dụng các quyền dư thừa hoặc alias cũ: `IsSave`, `IsEdit`, `canUse`, `canEdit`, `canSave`.
    - Các API nghiệp vụ cần bảo vệ quyền phải được gán attribute chuẩn:
      - Màn hình Suất ăn GA: `[HasPermission("3001_GA_MEAL_MANAGEMENT")]`
      - Màn hình Lịch làm việc: `[HasPermission("3002_GA_WORK_CALENDAR")]`

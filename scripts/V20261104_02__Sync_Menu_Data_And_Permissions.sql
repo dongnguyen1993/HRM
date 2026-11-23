@@ -1,4 +1,4 @@
--- ==============================================================================
+﻿-- ==============================================================================
 -- Migration Script: V20261104_02__Sync_Menu_Data_And_Permissions.sql
 -- Mục đích: ĐỒNG BỘ TOÀN DIỆN DỮ LIỆU MENU & PHÂN QUYỀN TRÊN SERVER
 -- 1. Chuẩn hóa đường dẫn Path sang tiền tố Domain (/ess/*, /ga/*, /hr/*, /sys/*)
@@ -390,41 +390,41 @@ BEGIN TRY
     -- 6. ĐỒNG BỘ PHÂN QUYỀN TRONG BẢNG SYS_AuthorGroupMapping
     -- --------------------------------------------------------------------------
     -- 6.1. Nhóm 1: Administrator có đầy đủ quyền với toàn bộ 3+1
-    INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsUpdate, IsDelete, IsSave, IsPrint)
+    INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsDelete, IsSave, IsPrint)
     SELECT 1, pm.ProgramId, 1, 1, 1, 1, 1, 1
     FROM dbo.SYS_ProgramMenus pm
     WHERE pm.UseFlag = 1
       AND NOT EXISTS (SELECT 1 FROM dbo.SYS_AuthorGroupMapping agm WHERE agm.GroupId = 1 AND agm.ProgramId = pm.ProgramId);
 
     UPDATE agm
-    SET IsSearch = 1, IsCreate = 1, IsUpdate = 1, IsDelete = 1, IsSave = 1, IsPrint = 1
+    SET IsSearch = 1, IsCreate = 1 = 1, IsDelete = 1, IsSave = 1, IsPrint = 1
     FROM dbo.SYS_AuthorGroupMapping agm
     JOIN dbo.SYS_ProgramMenus pm ON agm.ProgramId = pm.ProgramId
     WHERE agm.GroupId = 1 AND pm.UseFlag = 1;
 
     -- 6.2. Nhóm 3002: Quản Trị Nhân Sự (HR Officer) - cấp quyền đầy đủ phân hệ HR & ESS
-    INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsUpdate, IsDelete, IsSave, IsPrint)
+    INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsDelete, IsSave, IsPrint)
     SELECT 3002, pm.ProgramId, 1, 1, 1, 1, 1, 1
     FROM dbo.SYS_ProgramMenus pm
     WHERE pm.UseFlag = 1 AND pm.ProgramGroup IN ('HR', 'ESS')
       AND NOT EXISTS (SELECT 1 FROM dbo.SYS_AuthorGroupMapping agm WHERE agm.GroupId = 3002 AND agm.ProgramId = pm.ProgramId);
 
     -- 6.3. Nhóm 3003: Quản Trị Hành Chính (GA Officer) - cấp quyền đầy đủ phân hệ GA & ESS
-    INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsUpdate, IsDelete, IsSave, IsPrint)
+    INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsDelete, IsSave, IsPrint)
     SELECT 3003, pm.ProgramId, 1, 1, 1, 1, 1, 1
     FROM dbo.SYS_ProgramMenus pm
     WHERE pm.UseFlag = 1 AND pm.ProgramGroup IN ('GA', 'ESS')
       AND NOT EXISTS (SELECT 1 FROM dbo.SYS_AuthorGroupMapping agm WHERE agm.GroupId = 3003 AND agm.ProgramId = pm.ProgramId);
 
     -- 6.4. Nhóm 2003: Quản Lý Suất Ăn (Meal Manager) - cấp quyền xem/sửa phân hệ GA & ESS
-    INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsUpdate, IsDelete, IsSave, IsPrint)
+    INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsDelete, IsSave, IsPrint)
     SELECT 2003, pm.ProgramId, 1, 1, 1, 0, 1, 1
     FROM dbo.SYS_ProgramMenus pm
     WHERE pm.UseFlag = 1 AND (pm.ProgramKey IN ('MEAL_MANAGEMENT', '3000_GA', 'WORK_CALENDAR') OR pm.ProgramGroup = 'ESS')
       AND NOT EXISTS (SELECT 1 FROM dbo.SYS_AuthorGroupMapping agm WHERE agm.GroupId = 2003 AND agm.ProgramId = pm.ProgramId);
 
     -- 6.5. Nhóm User (2002) & Worker (1002): Cấp quyền phân hệ ESS
-    INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsUpdate, IsDelete, IsSave, IsPrint)
+    INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsDelete, IsSave, IsPrint)
     SELECT g.GroupId, pm.ProgramId, 1, 1, 1, 0, 1, 1
     FROM (VALUES (1002), (2002)) AS g(GroupId)
     CROSS JOIN dbo.SYS_ProgramMenus pm

@@ -1,4 +1,4 @@
--- =========================================================================================
+﻿-- =========================================================================================
 -- SCRIPT BỔ SUNG DÀNH RIÊNG CHO PHÂN HỆ SYS VÀ HR TRÊN MÔI TRƯỜNG REAL (PRODUCTION)
 -- Tên file: V20261120_REAL_MIGRATION_SYS_HR_ONLY.sql
 -- Phạm vi: Chỉ áp dụng cho SYS và HR (TUYỆT ĐỐI KHÔNG TÁC ĐỘNG VÀO PHÂN HỆ GA)
@@ -253,10 +253,10 @@ BEGIN TRY
     ON (target.GroupId = source.GroupId AND target.ProgramId = source.ProgramId)
     WHEN MATCHED THEN
         UPDATE SET 
-            IsSearch = 1, IsCreate = 1, IsUpdate = 1, IsDelete = 1, IsSave = 1, IsPrint = 1
+            IsSearch = 1, IsCreate = 1 = 1, IsDelete = 1, IsSave = 1, IsPrint = 1
     WHEN NOT MATCHED THEN
-        INSERT (GroupId, ProgramId, IsSearch, IsCreate, IsUpdate, IsDelete, IsSave, IsPrint)
-        VALUES (source.GroupId, source.ProgramId, 1, 1, 1, 1, 1, 1);
+        INSERT (GroupId, ProgramId, IsSearch, IsCreate, IsDelete, IsSave, IsPrint)
+        VALUES (source.GroupId, source.ProgramId, 1, 1, 1, 1, 1);
 
     PRINT N'   -> Đã cấp toàn quyền cho nhóm Quản Trị Nhân Sự trên toàn bộ 11 màn hình HR.';
 
@@ -360,7 +360,7 @@ PRINT N'========================================================================
 SELECT COUNT(1) AS [1. Tong_So_Nhan_Vien_HR_Employees] FROM dbo.HR_Employees;
 SELECT COUNT(1) AS [2. Tong_So_Ban_Ghi_View_VW_HR_Employees] FROM dbo.VW_HR_Employees;
 SELECT ProgramId, ProgramKey, ProgramName, [Path], SortOrder FROM dbo.SYS_ProgramMenus WHERE ProgramKey = '2011_HR_EMPLOYEES';
-SELECT g.GroupName, m.IsSearch, m.IsCreate, m.IsUpdate, m.IsDelete, m.IsSave, m.IsPrint
+SELECT g.GroupName, m.IsSearch, m.IsCreate, m.m.IsDelete, m.IsSave, m.IsPrint
 FROM dbo.SYS_AuthorGroupMapping m 
 INNER JOIN dbo.SYS_AuthorGroups g ON m.GroupId = g.GroupId 
 WHERE m.ProgramId = (SELECT ProgramId FROM dbo.SYS_ProgramMenus WHERE ProgramKey = '2011_HR_EMPLOYEES');

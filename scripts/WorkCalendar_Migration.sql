@@ -1,4 +1,4 @@
--- ==============================================================================
+﻿-- ==============================================================================
 -- MIGRATION SCRIPT: TẠO BẢNG VÀ PHÂN QUYỀN WORK CALENDAR & SPECIAL MEAL
 -- Dự án: HRM Enterprise System (MES-Hansol Standard)
 -- Ngày thực hiện: 2026-09-19
@@ -88,13 +88,13 @@ DECLARE @ProgId INT = (SELECT TOP 1 [ProgramId] FROM [dbo].[ProgramMenus] WHERE 
 
 IF @ProgId IS NOT NULL
 BEGIN
-    INSERT INTO [dbo].[AuthorGroupMapping] ([GroupId], [ProgramId], [IsSearch], [IsCreate], [IsUpdate], [IsDelete], [IsSave], [IsPrint])
+    INSERT INTO [dbo].[AuthorGroupMapping] ([GroupId], [ProgramId], [IsSearch], [IsCreate], [IsDelete], [IsSave], [IsPrint])
     SELECT 
         ag.[GroupId],
         @ProgId,
         1, -- IsSearch
         1, -- IsCreate
-        1, -- IsUpdate
+
         1, -- IsDelete
         1, -- IsSave
         1  -- IsPrint

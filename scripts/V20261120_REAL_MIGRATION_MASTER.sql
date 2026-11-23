@@ -1,4 +1,4 @@
--- =========================================================================================
+﻿-- =========================================================================================
 -- MASTER SCRIPT BỔ SUNG CHO MÔI TRƯỜNG REAL (PRODUCTION)
 -- Tên script: V20261120_REAL_MIGRATION_MASTER.sql
 -- Mục đích: Đồng bộ toàn bộ các cập nhật mới nhất cho phân hệ SYS, HR và GA lên Real:
@@ -80,13 +80,13 @@ BEGIN TRY
             IF EXISTS (SELECT 1 FROM dbo.SYS_AuthorGroupMapping WHERE GroupId = 2002 AND ProgramId = @VisitorRegProgId)
             BEGIN
                 UPDATE dbo.SYS_AuthorGroupMapping
-                SET IsSearch = 1, IsCreate = 1, IsUpdate = 1, IsDelete = 0, IsSave = 1, IsPrint = 1
+                SET IsSearch = 1, IsCreate = 1 = 1, IsDelete = 0, IsSave = 1, IsPrint = 1
                 WHERE GroupId = 2002 AND ProgramId = @VisitorRegProgId;
             END
             ELSE
             BEGIN
-                INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsUpdate, IsDelete, IsSave, IsPrint)
-                VALUES (2002, @VisitorRegProgId, 1, 1, 1, 0, 1, 1);
+                INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsDelete, IsSave, IsPrint)
+                VALUES (2002, @VisitorRegProgId, 1, 1, 1, 0, 1);
             END;
             PRINT N'   -> Đã cập nhật quyền Đăng ký khách cho nhóm USERS (2002).';
         END;
@@ -97,13 +97,13 @@ BEGIN TRY
             IF EXISTS (SELECT 1 FROM dbo.SYS_AuthorGroupMapping WHERE GroupId = 3003 AND ProgramId = @VisitorRegProgId)
             BEGIN
                 UPDATE dbo.SYS_AuthorGroupMapping
-                SET IsSearch = 1, IsCreate = 1, IsUpdate = 1, IsDelete = 1, IsSave = 1, IsPrint = 1
+                SET IsSearch = 1, IsCreate = 1 = 1, IsDelete = 1, IsSave = 1, IsPrint = 1
                 WHERE GroupId = 3003 AND ProgramId = @VisitorRegProgId;
             END
             ELSE
             BEGIN
-                INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsUpdate, IsDelete, IsSave, IsPrint)
-                VALUES (3003, @VisitorRegProgId, 1, 1, 1, 1, 1, 1);
+                INSERT INTO dbo.SYS_AuthorGroupMapping (GroupId, ProgramId, IsSearch, IsCreate, IsDelete, IsSave, IsPrint)
+                VALUES (3003, @VisitorRegProgId, 1, 1, 1, 1, 1);
             END;
             PRINT N'   -> Đã cập nhật quyền Đăng ký khách cho nhóm GA_MGMT (3003).';
         END;
