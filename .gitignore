@@ -92,4 +92,5 @@ logs/
 *.log
 *.tmp
 *.tmp.*
-**/wwwroot/uploads/
+wwwroot/
+**/wwwroot/

@@ -10,11 +10,11 @@
 --      - ShortBreakSchedules : Giờ nghỉ giải lao tính vào giờ làm
 --      - IsMealBreakPaid     : 1 = Ăn cơm TÍNH vào giờ làm; 0 = KHÔNG tính vào giờ làm
 --      - EffectiveFrom / EffectiveTo : Ngày hiệu lực áp dụng (lộ trình 2026-12-11)
---   2. Chuẩn hóa & thêm mới dữ liệu ca làm việc theo bảng quy định mới:
---      - SHIFT_DAY        (Văn Phòng - Hành chính, T2-T6, 07:30-18:00, ăn cơm 12:06-13:00 không tính công -> 9.60h)
---      - SHIFT_NIGHT      (Ca đêm chuẩn cũ 20:00-05:36 -> 9.60h, giữ nguyên cho lịch sử & trước 11/12/2026)
---      - SHIFT_PROD_DAY   (Sản Xuất - Hành chính 1, T2-T7, 07:30-16:30, ăn cơm 11:00-12:00 không tính công -> 8.00h, từ 11/12/2026)
---      - SHIFT_PROD_NIGHT (Sản Xuất - Ca đêm, T2-T7, 20:00-04:00, ăn cơm 23:30-00:15 TÍNH công -> 8.00h, từ 11/12/2026)
+--   2. Chuẩn hóa & thêm mới dữ liệu ca làm việc theo bảng quy định mới (ShiftCode tường minh theo Khối):
+--      - SHIFT_OFFICE_DAY   (Văn Phòng - Hành chính, T2-T6, 07:30-18:00, ăn cơm 12:06-13:00 không tính công -> 9.60h)
+--      - SHIFT_OFFICE_NIGHT (Văn Phòng - Ca đêm, T2-T6, 20:00-05:36, ăn cơm 00:00-00:45 không tính công -> 9.60h, giữ nguyên lâu dài)
+--      - SHIFT_PROD_DAY     (Sản Xuất - Hành chính 1, T2-T7, 07:30-16:30, ăn cơm 11:00-12:00 không tính công -> 8.00h, từ 11/12/2026)
+--      - SHIFT_PROD_NIGHT   (Sản Xuất - Ca đêm, T2-T7, 20:00-04:00, ăn cơm 23:30-00:15 TÍNH công -> 8.00h, từ 11/12/2026)
 --   3. Khóa quyền Thêm/Sửa/Xóa (IsCreate=0, IsUpdate=0, IsDelete=0) trên màn hình
 --      2005_HR_SHIFT_SETUP trong SYS_AuthorGroupMapping (chỉ giữ quyền Xem & In/Xuất).
 -- Lưu ý: Script IDEMPOTENT (chạy lại nhiều lần đều an toàn), chuỗi Unicode dùng N'...'.
@@ -81,12 +81,13 @@ BEGIN TRY
     PRINT N'================================================================================';
 
     -- ---------------------------------------------------------------------------------
-    -- 2.1 KHỐI VĂN PHÒNG - CA HÀNH CHÍNH (SHIFT_DAY)
+    -- 2.1 KHỐI VĂN PHÒNG - CA HÀNH CHÍNH (SHIFT_OFFICE_DAY)
     --   - Thứ 2 - Thứ 6 | 07:30 - 18:00 (10.5h)
     --   - Giải lao tính công: 09:30-09:40, 15:00-15:10
     --   - Ăn cơm KHÔNG tính công: 12:06-13:00 (54 phút = 0.90h) => Công chuẩn = 9.60h
+    --   - Đổi tên mã từ SHIFT_DAY -> SHIFT_OFFICE_DAY ngay trên bản ghi cũ để giữ nguyên ShiftId=1.
     -- ---------------------------------------------------------------------------------
-    IF EXISTS (SELECT 1 FROM dbo.HR_WorkShifts WHERE ShiftCode = 'SHIFT_DAY')
+    IF EXISTS (SELECT 1 FROM dbo.HR_WorkShifts WHERE ShiftCode = 'SHIFT_OFFICE_DAY')
     BEGIN
         UPDATE dbo.HR_WorkShifts
         SET ShiftName           = N'Văn Phòng - Hành Chính (07:30 - 18:00)',
@@ -105,8 +106,31 @@ BEGIN TRY
             IsMealBreakPaid     = 0,
             EffectiveFrom       = NULL,
             EffectiveTo         = NULL
+        WHERE ShiftCode = 'SHIFT_OFFICE_DAY';
+        PRINT N'   -> Đã cập nhật SHIFT_OFFICE_DAY (Văn Phòng - Hành Chính).';
+    END
+    ELSE IF EXISTS (SELECT 1 FROM dbo.HR_WorkShifts WHERE ShiftCode = 'SHIFT_DAY')
+    BEGIN
+        UPDATE dbo.HR_WorkShifts
+        SET ShiftCode           = 'SHIFT_OFFICE_DAY',
+            ShiftName           = N'Văn Phòng - Hành Chính (07:30 - 18:00)',
+            StartTime           = CAST('07:30:00' AS TIME(7)),
+            EndTime             = CAST('18:00:00' AS TIME(7)),
+            BreakStartTime      = CAST('12:06:00' AS TIME(7)),
+            BreakEndTime        = CAST('13:00:00' AS TIME(7)),
+            GracePeriodMinutes  = 5,
+            TotalWorkHours      = 9.60,
+            IsOvernight         = 0,
+            Description         = N'[Văn Phòng | T2-T6] Giải lao 09:30-09:40, 15:00-15:10 (tính công); Ăn cơm 12:06-13:00 (không tính công).',
+            UseFlag             = 1,
+            DivisionType        = N'OFFICE',
+            WorkDaysPattern     = 'MON-FRI',
+            ShortBreakSchedules = N'09:30-09:40, 15:00-15:10',
+            IsMealBreakPaid     = 0,
+            EffectiveFrom       = NULL,
+            EffectiveTo         = NULL
         WHERE ShiftCode = 'SHIFT_DAY';
-        PRINT N'   -> Đã cập nhật SHIFT_DAY (Văn Phòng - Hành Chính).';
+        PRINT N'   -> Đã chuẩn hóa SHIFT_DAY -> SHIFT_OFFICE_DAY (giữ nguyên ShiftId).';
     END
     ELSE
     BEGIN
@@ -116,7 +140,7 @@ BEGIN TRY
             DivisionType, WorkDaysPattern, ShortBreakSchedules, IsMealBreakPaid, EffectiveFrom, EffectiveTo
         )
         VALUES (
-            'SHIFT_DAY', N'Văn Phòng - Hành Chính (07:30 - 18:00)',
+            'SHIFT_OFFICE_DAY', N'Văn Phòng - Hành Chính (07:30 - 18:00)',
             CAST('07:30:00' AS TIME(7)), CAST('18:00:00' AS TIME(7)),
             CAST('12:06:00' AS TIME(7)), CAST('13:00:00' AS TIME(7)),
             5, 9.60, 0,
@@ -124,24 +148,77 @@ BEGIN TRY
             1, GETUTCDATE(),
             N'OFFICE', 'MON-FRI', N'09:30-09:40, 15:00-15:10', 0, NULL, NULL
         );
-        PRINT N'   -> Đã thêm mới SHIFT_DAY (Văn Phòng - Hành Chính).';
+        PRINT N'   -> Đã thêm mới SHIFT_OFFICE_DAY (Văn Phòng - Hành Chính).';
     END;
 
     -- ---------------------------------------------------------------------------------
-    -- 2.2 GIỮ NGUYÊN CA ĐÊM CHUẨN CŨ (SHIFT_NIGHT) CHO DỮ LIỆU LỊCH SỬ & TRƯỚC 11/12/2026
-    --   - Không ghi đè giờ 20:00-05:36 của ShiftId=2 để bảo toàn 145k+ dòng HR_WorkSummary cũ
-    --     và giúp sp_CalculateTimesheetEngine chạy đúng từ nay đến hết 10/12/2026.
+    -- 2.2 KHỐI VĂN PHÒNG - CA ĐÊM (SHIFT_OFFICE_NIGHT) - GIỮ NGUYÊN NHƯ CŨ, KHÔNG GIỚI HẠN NGÀY
+    --   - Thứ 2 - Thứ 6 | 20:00 - 05:36 (qua ngày, IsOvernight = 1)
+    --   - Ăn cơm KHÔNG tính công: 00:00-00:45 (45 phút) => Công chuẩn = 9.60h
+    --   - Đổi tên mã từ SHIFT_NIGHT -> SHIFT_OFFICE_NIGHT ngay trên bản ghi cũ để giữ nguyên ShiftId=2.
     -- ---------------------------------------------------------------------------------
-    IF EXISTS (SELECT 1 FROM dbo.HR_WorkShifts WHERE ShiftCode = 'SHIFT_NIGHT')
+    IF EXISTS (SELECT 1 FROM dbo.HR_WorkShifts WHERE ShiftCode = 'SHIFT_OFFICE_NIGHT')
     BEGIN
         UPDATE dbo.HR_WorkShifts
-        SET DivisionType        = N'LEGACY',
-            WorkDaysPattern     = 'MON-SAT',
+        SET ShiftName           = N'Văn Phòng - Ca Đêm (20:00 - 05:36)',
+            StartTime           = CAST('20:00:00' AS TIME(7)),
+            EndTime             = CAST('05:36:00' AS TIME(7)),
+            BreakStartTime      = CAST('00:00:00' AS TIME(7)),
+            BreakEndTime        = CAST('00:45:00' AS TIME(7)),
+            GracePeriodMinutes  = 5,
+            TotalWorkHours      = 9.60,
+            IsOvernight         = 1,
+            Description         = N'[Văn Phòng | Giữ nguyên] Khung quẹt vào 19:30 - 20:05, về sau 05:36 sáng hôm sau, ăn cơm 00:00-00:45, công chuẩn 9.6h.',
+            UseFlag             = 1,
+            DivisionType        = N'OFFICE',
+            WorkDaysPattern     = 'MON-FRI',
+            ShortBreakSchedules = NULL,
             IsMealBreakPaid     = 0,
-            EffectiveTo         = '2026-12-10',
-            Description         = N'[Ca đêm cũ | Đến 10/12/2026] Khung quẹt vào 19:30 - 20:05, về sau 05:36 sáng hôm sau, công chuẩn 9.6h.'
+            EffectiveFrom       = NULL,
+            EffectiveTo         = NULL
+        WHERE ShiftCode = 'SHIFT_OFFICE_NIGHT';
+        PRINT N'   -> Đã cập nhật SHIFT_OFFICE_NIGHT (Văn Phòng - Ca Đêm 20:00 - 05:36).';
+    END
+    ELSE IF EXISTS (SELECT 1 FROM dbo.HR_WorkShifts WHERE ShiftCode = 'SHIFT_NIGHT')
+    BEGIN
+        UPDATE dbo.HR_WorkShifts
+        SET ShiftCode           = 'SHIFT_OFFICE_NIGHT',
+            ShiftName           = N'Văn Phòng - Ca Đêm (20:00 - 05:36)',
+            StartTime           = CAST('20:00:00' AS TIME(7)),
+            EndTime             = CAST('05:36:00' AS TIME(7)),
+            BreakStartTime      = CAST('00:00:00' AS TIME(7)),
+            BreakEndTime        = CAST('00:45:00' AS TIME(7)),
+            GracePeriodMinutes  = 5,
+            TotalWorkHours      = 9.60,
+            IsOvernight         = 1,
+            Description         = N'[Văn Phòng | Giữ nguyên] Khung quẹt vào 19:30 - 20:05, về sau 05:36 sáng hôm sau, ăn cơm 00:00-00:45, công chuẩn 9.6h.',
+            UseFlag             = 1,
+            DivisionType        = N'OFFICE',
+            WorkDaysPattern     = 'MON-FRI',
+            ShortBreakSchedules = NULL,
+            IsMealBreakPaid     = 0,
+            EffectiveFrom       = NULL,
+            EffectiveTo         = NULL
         WHERE ShiftCode = 'SHIFT_NIGHT';
-        PRINT N'   -> Đã giữ nguyên khung giờ SHIFT_NIGHT (gắn EffectiveTo = 2026-12-10).';
+        PRINT N'   -> Đã chuẩn hóa SHIFT_NIGHT -> SHIFT_OFFICE_NIGHT (giữ nguyên ShiftId).';
+    END
+    ELSE
+    BEGIN
+        INSERT INTO dbo.HR_WorkShifts (
+            ShiftCode, ShiftName, StartTime, EndTime, BreakStartTime, BreakEndTime,
+            GracePeriodMinutes, TotalWorkHours, IsOvernight, Description, UseFlag, CreatedAt,
+            DivisionType, WorkDaysPattern, ShortBreakSchedules, IsMealBreakPaid, EffectiveFrom, EffectiveTo
+        )
+        VALUES (
+            'SHIFT_OFFICE_NIGHT', N'Văn Phòng - Ca Đêm (20:00 - 05:36)',
+            CAST('20:00:00' AS TIME(7)), CAST('05:36:00' AS TIME(7)),
+            CAST('00:00:00' AS TIME(7)), CAST('00:45:00' AS TIME(7)),
+            5, 9.60, 1,
+            N'[Văn Phòng | Giữ nguyên] Khung quẹt vào 19:30 - 20:05, về sau 05:36 sáng hôm sau, ăn cơm 00:00-00:45, công chuẩn 9.6h.',
+            1, GETUTCDATE(),
+            N'OFFICE', 'MON-FRI', NULL, 0, NULL, NULL
+        );
+        PRINT N'   -> Đã thêm mới SHIFT_OFFICE_NIGHT (Văn Phòng - Ca Đêm 20:00 - 05:36).';
     END;
 
     -- ---------------------------------------------------------------------------------
