@@ -92,5 +92,7 @@ logs/
 *.log
 *.tmp
 *.tmp.*
-wwwroot/
-**/wwwroot/
+~$*
+**/~$*
+wwwroot/uploads/
+**/wwwroot/uploads/
